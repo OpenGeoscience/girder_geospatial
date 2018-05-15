@@ -7,5 +7,10 @@ setup(
         'geometa.formats': [
             'geotiff=schema'
         ]
-    }
+    },
+    install_requires=[
+        # Eventually will require geometa girder plugin
+        # as a dependency here
+        'rasterio'
+    ]
 )
