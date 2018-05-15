@@ -10,6 +10,10 @@ setup(
         'geometa.formats': []
     },
     install_requires=[
-        'pyproj'
+        'pyproj',
+        'shapely',
+        # Will fix it once marshmallow publishes new version
+        'marshmallow==3.0.0b10',
+        'geojson'
     ]
 )
