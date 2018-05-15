@@ -13,6 +13,8 @@ class GeotiffSchema(BaseSchema):
     height = fields.Integer(required=True)
     bands = fields.Integer(required=True)
     affine = fields.List(fields.Float, required=True)
+    bandInfo = fields.List(fields.String, required=True)
+    noData = fields.Float()
 
 
 def handler(path):
@@ -32,7 +34,10 @@ def handler(path):
         metadata['crs'] = crs
         metadata['affine'] = (affine.a, affine.b, affine.c,
                               affine.d, affine.e, affine.f)
+        metadata['bandInfo'] = [src.colorinterp(i+1).name for i in range(src.count)]
 
+    if src.nodata:
+        metadata['noData'] = src.nodata
     metadata['nativeBounds'] = {'left': bounds.left,
                                 'right': bounds.right,
                                 'bottom': bounds.bottom,
