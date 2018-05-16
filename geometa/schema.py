@@ -2,17 +2,13 @@ from marshmallow import Schema, fields
 import pyproj
 
 
-class WrongGeospatialMetadata(Exception):
-    pass
-
-
 class Crs(fields.Field):
     def _deserialize(self, value, attr, obj):
         try:
             pyproj.Proj(value, errcheck=True)
             return value
         except RuntimeError:
-            raise WrongGeospatialMetadata('crs is not a valid proj4 string.')
+            return ''
 
 
 class Bounds(fields.Field):
