@@ -18,11 +18,14 @@ def upload_handler(event):
         _id = event.info['file']['_id']
         girder_file = File().load(_id, force=True)
         path = _get_girder_path(girder_file)
-        metadata = plugin.handler(path)
-        schema = BaseSchema()
-        schema.load(metadata)
-        girder_file['geometa'] = metadata
-        File().save(girder_file)
+        try:
+            metadata = plugin.handler(path)
+            schema = BaseSchema()
+            schema.load(metadata)
+            girder_file['geometa'] = metadata
+            File().save(girder_file)
+        except AttributeError:
+            pass
 
 
 def load(info):
