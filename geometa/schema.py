@@ -9,16 +9,10 @@ class WrongGeospatialMetadata(Exception):
 class Crs(fields.Field):
     def _deserialize(self, value, attr, obj):
         try:
-            pyproj.Proj(init=value, errcheck=True)
+            pyproj.Proj(value, errcheck=True)
             return value
         except RuntimeError:
             raise WrongGeospatialMetadata('crs is not a valid proj4 string.')
-
-
-class NativeBounds(fields.Field):
-    # TODO: Validate native bounds
-    def _deserialize(self, value, attr, obj):
-        return value
 
 
 class Bounds(fields.Field):
@@ -29,7 +23,7 @@ class Bounds(fields.Field):
 
 class BaseSchema(Schema):
     crs = Crs(required=True)
-    nativeBounds = NativeBounds(required=True)
+    nativeBounds = fields.Dict(required=True)
     bounds = Bounds(required=True)
     type_ = fields.String(required=True)
     date = fields.Date(default='')

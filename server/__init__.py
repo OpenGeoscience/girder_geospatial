@@ -14,17 +14,15 @@ def _get_girder_path(girder_file):
 
 def upload_handler(event):
     for entry_point in pkg_resources.iter_entry_points('geometa.formats'):
-        extension = str(event.info['file']['exts'][-1])
         plugin = entry_point.load()
-        if extension in plugin.EXTENSIONS:
-            _id = event.info['file']['_id']
-            girder_file = File().load(_id, force=True)
-            path = _get_girder_path(girder_file)
-            metadata = plugin.handler(path)
-            schema = BaseSchema()
-            schema.load(metadata)
-            girder_file['geometa'] = metadata
-            File().save(girder_file)
+        _id = event.info['file']['_id']
+        girder_file = File().load(_id, force=True)
+        path = _get_girder_path(girder_file)
+        metadata = plugin.handler(path)
+        schema = BaseSchema()
+        schema.load(metadata)
+        girder_file['geometa'] = metadata
+        File().save(girder_file)
 
 
 def load(info):
