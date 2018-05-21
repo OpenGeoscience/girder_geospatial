@@ -1,6 +1,6 @@
 from marshmallow import fields
 from geometa.schema import BaseSchema
-from geometa import from_bounds_to_geojson
+from geometa import from_bounds_to_geojson, CannotHandleError
 import gdal
 import osr
 
@@ -51,22 +51,26 @@ def get_bounds(dataset):
 
 
 def handler(path):
-    # Returns metadata for girder to save it on the file model
-    metadata = {}
-    metadata['type_'] = 'raster'
+    try:
+        # Returns metadata for girder to save it on the file model
+        metadata = {}
+        metadata['type_'] = 'raster'
 
-    dataset = gdal.Open(path)
-    crs = get_projection_as_proj4(dataset)
-    bounds = get_bounds(dataset)
+        dataset = gdal.Open(path)
 
-    metadata['crs'] = crs
-    metadata['bands'] = dataset.RasterCount
-    metadata['bandInfo'] = get_band_info(dataset)
-    metadata['affine'] = list(dataset.GetGeoTransform())
-    metadata['width'] = dataset.RasterXSize
-    metadata['height'] = dataset.RasterYSize
-    metadata['driver'] = dataset.GetDriver().LongName
-    metadata['nativeBounds'] = bounds
-    metadata['bounds'] = from_bounds_to_geojson(bounds, crs)
-    schema = GeotiffSchema()
-    return schema.load(metadata)
+        crs = get_projection_as_proj4(dataset)
+        bounds = get_bounds(dataset)
+
+        metadata['crs'] = crs
+        metadata['bands'] = dataset.RasterCount
+        metadata['bandInfo'] = get_band_info(dataset)
+        metadata['affine'] = list(dataset.GetGeoTransform())
+        metadata['width'] = dataset.RasterXSize
+        metadata['height'] = dataset.RasterYSize
+        metadata['driver'] = dataset.GetDriver().LongName
+        metadata['nativeBounds'] = bounds
+        metadata['bounds'] = from_bounds_to_geojson(bounds, crs)
+        schema = GeotiffSchema()
+        return schema.load(metadata)
+    except AttributeError:
+        raise CannotHandleError('Gdal could not open dataset')

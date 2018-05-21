@@ -3,6 +3,10 @@ from pyproj import Proj, transform
 import json
 
 
+class CannotHandleError(Exception):
+    pass
+
+
 def from_bounds_to_geojson(bounds, crs):
     try:
         in_proj = Proj(crs)
