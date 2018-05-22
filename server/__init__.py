@@ -17,19 +17,18 @@ def _get_girder_path(girder_file):
 
 
 def upload_handler(event):
+    _id = event.info['file']['_id']
+    girder_file = File().load(_id, force=True)
+    path = _get_girder_path(girder_file)
     for entry_point_name, entry_point in Registry.items():
-        plugin = entry_point.load()
-        _id = event.info['file']['_id']
-        girder_file = File().load(_id, force=True)
-        path = _get_girder_path(girder_file)
         try:
-            metadata = plugin.handler(path)
+            metadata = entry_point(path)
             schema = BaseSchema()
             schema.load(metadata)
-            if 'geometa' in girder_file:
-                girder_file['geometa'][entry_point_name] = metadata
-            else:
-                girder_file['geometa'] = metadata
+            # namespace metadata with entry point names
+            # to avoid conflicts between handlers
+            girder_file['geometa'] = {}
+            girder_file['geometa'][entry_point_name] = metadata
             File().save(girder_file)
         except CannotHandleError:
             pass
@@ -37,5 +36,5 @@ def upload_handler(event):
 
 def load(info):
     for entry_point in pkg_resources.iter_entry_points('geometa.formats'):
-        Registry[entry_point.name] = entry_point
+        Registry[entry_point.name] = entry_point.load()
     events.bind('model.file.finalizeUpload.after', info['name'], upload_handler)
