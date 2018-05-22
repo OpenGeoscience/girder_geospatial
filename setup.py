@@ -3,6 +3,7 @@ from setuptools import setup
 setup(
     name='girder-plugin-geometa',
     author='Kitware, Inc.',
+    version='0.1.0',
     packages=[
         'geometa'
     ],
