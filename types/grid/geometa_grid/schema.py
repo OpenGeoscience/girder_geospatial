@@ -1,5 +1,5 @@
-from marshmallow import fields, Schema
-from geometa.schema import BaseSchema, Type_
+from marshmallow import fields
+from geometa.schema import BaseSchema
 from geometa import from_bounds_to_geojson, CannotHandleError
 import gdal
 import osr
@@ -11,10 +11,17 @@ class SubDatasets(fields.Field):
         return value
 
 
-class GridSchema(Schema):
-    type_ = Type_(required=True)
+class GridSubdatasetSchema(BaseSchema):
+    name = fields.Str(required=True)
+    driver = fields.String(required=True)
+    width = fields.Integer(required=True)
+    height = fields.Integer(required=True)
+    affine = fields.List(fields.Float, required=True)
+
+
+class GridSchema(BaseSchema):
     # Each subdataset must follow the base schema
-    subDatasets = fields.Nested(BaseSchema, many=True, required=True)
+    subDatasets = fields.Nested(GridSubdatasetSchema, many=True, required=True)
 
 
 def get_bounds(dataset):
@@ -38,17 +45,19 @@ def get_projection_as_proj4(dataset):
 
 def get_subdataset_info(subDataset):
     dataset = gdal.Open(subDataset)
+
     crs = get_projection_as_proj4(dataset) or '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
     metadata = {}
     bounds = get_bounds(dataset)
     metadata['crs'] = crs
     metadata['type_'] = 'grid'
-    metadata['affine'] = list(dataset.GetGeoTransform())
-    metadata['width'] = dataset.RasterXSize
-    metadata['height'] = dataset.RasterYSize
+    metadata['name'] = dataset.GetDescription()
     metadata['driver'] = dataset.GetDriver().LongName
     metadata['nativeBounds'] = bounds
     metadata['bounds'] = from_bounds_to_geojson(bounds, crs)
+    metadata['affine'] = list(dataset.GetGeoTransform())
+    metadata['width'] = dataset.RasterXSize
+    metadata['height'] = dataset.RasterYSize
 
     return metadata
 
@@ -67,6 +76,15 @@ def handler(path):
             gdal.Open(main_dataset.GetSubDatasets()[0][0])
         except IndexError:
             raise CannotHandleError('Does not have subdatasets')
+        dataset = gdal.Open(main_dataset.GetSubDatasets()[0][0])
+        crs = get_projection_as_proj4(dataset) or '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
+        metadata = {}
+        bounds = get_bounds(dataset)
+        metadata['crs'] = crs
+        metadata['type_'] = 'grid'
+        metadata['driver'] = dataset.GetDriver().LongName
+        metadata['nativeBounds'] = bounds
+        metadata['bounds'] = from_bounds_to_geojson(bounds, crs)
         metadata['subDatasets'] = get_subdatasets(main_dataset)
         schema = GridSchema()
         return schema.load(metadata)

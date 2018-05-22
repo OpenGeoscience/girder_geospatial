@@ -57,6 +57,8 @@ def handler(path):
         metadata['type_'] = 'raster'
 
         dataset = gdal.Open(path)
+        if dataset.GetSubDatasets():
+            raise CannotHandleError('Cannot handle this data type')
 
         crs = get_projection_as_proj4(dataset)
         bounds = get_bounds(dataset)
