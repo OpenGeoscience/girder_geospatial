@@ -8,9 +8,12 @@ setup(
     author='Kitware, Inc.',
     entry_points={
         'geometa.formats': [
-            'raster=schema'
+            'raster=geometa_raster.schema:handler'
         ]
     },
+    packages=[
+        'geometa_raster'
+    ],
     install_requires=[
         # Eventually will require geometa girder plugin
         # as a dependency here

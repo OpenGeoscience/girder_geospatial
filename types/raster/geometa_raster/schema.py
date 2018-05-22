@@ -1,11 +1,11 @@
-from marshmallow import fields
+from marshmallow import fields, ValidationError
 from geometa.schema import BaseSchema
 from geometa import from_bounds_to_geojson, CannotHandleError
 import gdal
 import osr
 
 
-class GeotiffSchema(BaseSchema):
+class RasterSchema(BaseSchema):
     driver = fields.String(required=True)
     width = fields.Integer(required=True)
     height = fields.Integer(required=True)
@@ -70,7 +70,10 @@ def handler(path):
         metadata['driver'] = dataset.GetDriver().LongName
         metadata['nativeBounds'] = bounds
         metadata['bounds'] = from_bounds_to_geojson(bounds, crs)
-        schema = GeotiffSchema()
-        return schema.load(metadata)
+        schema = RasterSchema()
+        try:
+            return schema.load(metadata)
+        except ValidationError as e:
+            raise CannotHandleError(e.messages)
     except AttributeError:
         raise CannotHandleError('Gdal could not open dataset')
