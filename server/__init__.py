@@ -28,7 +28,12 @@ def upload_handler(event):
         try:
             metadata = entry_point(path)
             schema = BaseSchema()
-            schema.load(metadata)
+            if 'subDatasets' in metadata:
+                [schema.load(i) for i in metadata['subDatasets']]
+            elif 'layers' in metadata:
+                [schema.load(i) for i in metadata['layers']]
+            else:
+                schema.load(metadata)
             # namespace metadata with entry point names
             # to avoid conflicts between handlers
             girder_file['geometa'] = {}
