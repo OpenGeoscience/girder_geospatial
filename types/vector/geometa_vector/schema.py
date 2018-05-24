@@ -2,6 +2,8 @@ from marshmallow import fields
 from geometa.schema import BaseSchema
 from geometa import from_bounds_to_geojson, CannotHandleError
 import ogr
+from shapely.geometry import Polygon
+from shapely.ops import cascaded_union
 
 
 class Layers(fields.Field):
@@ -64,11 +66,16 @@ def handler(path):
         metadata['driver'] = dataset.GetDriver().GetName()
         metadata['layers'] = dataset.GetLayerCount()
         metadata['layerInfo'] = get_layers(dataset)
+        layerBounds = [Polygon.from_bounds(i['nativeBounds']['left'],
+                                           i['nativeBounds']['bottom'],
+                                           i['nativeBounds']['right'],
+                                           i['nativeBounds']['top'])
+                       for i in metadata['layerInfo']]
+        union = cascaded_union(layerBounds)
         layer = dataset.GetLayer(0)
-        extent = layer.GetExtent()
         crs = layer.GetSpatialRef().ExportToProj4()
-        bounds = {'left': extent[0], 'right': extent[1],
-                  'bottom': extent[2], 'top': extent[3]}
+        bounds = {'left': union.bounds[0], 'right': union.bounds[1],
+                  'bottom': union.bounds[2], 'top': union.bounds[3]}
         metadata['crs'] = crs
         metadata['nativeBounds'] = bounds
         metadata['type_'] = 'vector'
