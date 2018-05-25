@@ -3,6 +3,8 @@ from geometa.schema import BaseSchema
 from geometa import from_bounds_to_geojson, CannotHandleError
 import gdal
 import osr
+from shapely.geometry import Polygon
+from shapely.ops import cascaded_union
 
 
 class SubDatasets(fields.Field):
@@ -79,13 +81,21 @@ def handler(path):
         dataset = gdal.Open(main_dataset.GetSubDatasets()[0][0])
         crs = get_projection_as_proj4(dataset) or '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
         metadata = {}
-        bounds = get_bounds(dataset)
+        metadata['subDatasets'] = get_subdatasets(main_dataset)
+        subDatasetBounds = [Polygon.from_bounds(i['nativeBounds']['left'],
+                                                i['nativeBounds']['bottom'],
+                                                i['nativeBounds']['right'],
+                                                i['nativeBounds']['top'])
+                            for i in metadata['subDatasets']]
+        union = cascaded_union(subDatasetBounds)
+        bounds = {'left': union.bounds[0], 'right': union.bounds[1],
+                  'bottom': union.bounds[2], 'top': union.bounds[3]}
         metadata['crs'] = crs
         metadata['type_'] = 'grid'
         metadata['driver'] = dataset.GetDriver().LongName
         metadata['nativeBounds'] = bounds
         metadata['bounds'] = from_bounds_to_geojson(bounds, crs)
-        metadata['subDatasets'] = get_subdatasets(main_dataset)
+
         schema = GridSchema()
         return schema.load(metadata)
     except AttributeError:
