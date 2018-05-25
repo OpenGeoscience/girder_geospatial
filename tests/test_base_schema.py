@@ -92,4 +92,4 @@ def test_bad_bounds(bounds, message):
     schema = BaseSchema()
     with pytest.raises(ValidationError) as exception:
         schema.load(metadata)
-    assert exception.value.message == message
+    assert exception.value.messages == message
