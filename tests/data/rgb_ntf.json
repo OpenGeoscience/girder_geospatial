@@ -1,0 +1,49 @@
+{
+  "crs": "+proj=longlat +datum=WGS84 +no_defs ",
+  "bandInfo": [
+    {
+      "scale": 1,
+      "dataType": "Byte",
+      "units": "",
+      "offset": 0,
+      "colorInterpretation": "Red",
+      "noData": null
+    },
+    {
+      "scale": 1,
+      "dataType": "Byte",
+      "units": "",
+      "offset": 0,
+      "colorInterpretation": "Green",
+      "noData": null
+    },
+    {
+      "scale": 1,
+      "dataType": "Byte",
+      "units": "",
+      "offset": 0,
+      "colorInterpretation": "Blue",
+      "noData": null
+    }
+  ],
+  "bands": 3,
+  "affine": [
+    -44.84202947845805,
+    0.0035034013605442214,
+    0,
+    -22.930748299319728,
+    0,
+    -0.0035034013605442214
+  ],
+  "driver": "National Imagery Transmission Format",
+  "bounds": "{\"type\": \"Polygon\", \"coordinates\": [[[-44.84202947845805, -23.105918367346938], [-44.84202947845805, -22.930748299319728], [-44.66685941043084, -22.930748299319728], [-44.66685941043084, -23.105918367346938], [-44.84202947845805, -23.105918367346938]]]}",
+  "nativeBounds": {
+    "top": -22.930748299319728,
+    "bottom": -23.105918367346938,
+    "right": -44.66685941043084,
+    "left": -44.84202947845805
+  },
+  "height": 50,
+  "width": 50,
+  "type_": "raster"
+}

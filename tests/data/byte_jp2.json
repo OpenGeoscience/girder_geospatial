@@ -1,0 +1,33 @@
+{
+  "crs": "+proj=utm +zone=11 +datum=NAD27 +units=m +no_defs ",
+  "bandInfo": [
+    {
+      "scale": 1,
+      "dataType": "Byte",
+      "units": "",
+      "offset": 0,
+      "colorInterpretation": "Gray",
+      "noData": null
+    }
+  ],
+  "bands": 1,
+  "affine": [
+    440720,
+    60,
+    0,
+    3751320,
+    0,
+    -60
+  ],
+  "driver": "JPEG-2000 driver based on OpenJPEG library",
+  "bounds": "{\"type\": \"Polygon\", \"coordinates\": [[[-117.64164861382405, 33.84825605097925], [-117.64164861382405, 33.90268852241786], [-117.5771596266894, 33.90268852241786], [-117.5771596266894, 33.84825605097925], [-117.64164861382405, 33.84825605097925]]]}",
+  "nativeBounds": {
+    "top": 3751320,
+    "bottom": 3745320,
+    "right": 446720,
+    "left": 440720
+  },
+  "height": 100,
+  "width": 100,
+  "type_": "raster"
+}

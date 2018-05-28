@@ -1,0 +1,33 @@
+{
+  "crs": "+proj=utm +zone=11 +datum=NAD27 +units=m +no_defs ",
+  "bandInfo": [
+    {
+      "scale": 1,
+      "dataType": "Byte",
+      "units": "",
+      "offset": 0,
+      "colorInterpretation": "Gray",
+      "noData": null
+    }
+  ],
+  "bands": 1,
+  "affine": [
+    440720,
+    60,
+    0,
+    3751320,
+    0,
+    -60
+  ],
+  "driver": "GeoTIFF",
+  "bounds": "{\"type\": \"Polygon\", \"coordinates\": [[[-117.64197285993784, 33.89154541437348], [-117.64197285993784, 33.902434604271356], [-117.6290752319567, 33.902434604271356], [-117.6290752319567, 33.89154541437348], [-117.64197285993784, 33.89154541437348]]]}",
+  "nativeBounds": {
+    "top": 3751320,
+    "bottom": 3750120,
+    "right": 441920,
+    "left": 440720
+  },
+  "height": 20,
+  "width": 20,
+  "type_": "raster"
+}
