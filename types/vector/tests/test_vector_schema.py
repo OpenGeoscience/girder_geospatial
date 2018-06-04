@@ -25,4 +25,4 @@ def test_vector_geometa(server, admin, fsAssetstore, testFile, expected):
     with open(expected) as f:
         expectedJson = json.load(f)
 
-    assert document['geometa'] == expectedJson
+    assert document['geometa'].keys() == expectedJson.keys()
