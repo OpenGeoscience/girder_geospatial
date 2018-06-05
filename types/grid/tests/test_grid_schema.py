@@ -7,12 +7,9 @@ from girder.models.file import File
 
 @pytest.mark.plugin('geometa')
 @pytest.mark.parametrize('testFile, expected', [
-    ('tests/data/byte.tif', 'tests/data/byte_tif.json'),
-    ('tests/data/float.img', 'tests/data/float_img.json'),
-    ('tests/data/byte.jp2', 'tests/data/byte_jp2.json'),
-    ('tests/data/rgb.ntf', 'tests/data/rgb_ntf.json')
+    ('tests/data/sresa1b_ncar_ccsm3-example.nc', 'tests/data/sresa1b_ncar_ccsm3-example_nc.json')
 ])
-def test_raster_geometa(server, admin, fsAssetstore, testFile, expected):
+def test_grid_geometa(server, admin, fsAssetstore, testFile, expected):
     name = os.path.basename(testFile)
     public = server.request(path='/folder', user=admin, method='GET',
                             params={'parentId': admin['_id'],
@@ -24,7 +21,7 @@ def test_raster_geometa(server, admin, fsAssetstore, testFile, expected):
         uploadedFile = server.uploadFile(name, f.read(), admin, public.json[0])
         document = File().load(uploadedFile['_id'], user=admin)
 
-    with open(expected) as f:
+    with open(expected, 'r') as f:
         expectedJson = json.load(f)
 
     assert list(document['geometa']).sort() == list(expectedJson).sort()
