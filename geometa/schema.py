@@ -1,3 +1,4 @@
+import json
 from marshmallow import Schema, fields, ValidationError
 import pyproj
 import geojson
@@ -15,12 +16,12 @@ class Crs(fields.Field):
 class Bounds(fields.Field):
     def _deserialize(self, value, attr, obj):
         try:
-            geojson_obj = geojson.loads(value)
+            geojson_obj = geojson.loads(json.dumps(value))
             if geojson_obj.is_valid and geojson_obj['type'] == 'Polygon':
                 return value
             else:
                 raise ValidationError('bounds must be a polygon')
-        except ValueError:
+        except AttributeError:
             raise ValidationError('bounds must be a valid geojson geometry')
 
 

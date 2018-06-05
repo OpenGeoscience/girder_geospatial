@@ -2,7 +2,6 @@ from geometa.schema import BaseSchema
 from geometa import from_bounds_to_geojson
 import pytest
 from marshmallow import ValidationError
-import json
 
 
 def sampleBounds():
@@ -68,28 +67,13 @@ def test_bad_type(type_):
         schema.load(metadata)
 
 
-@pytest.mark.parametrize('bounds, message', [
-    ('foobar', {'bounds': ['bounds must be a valid geojson geometry']}),
-    (json.dumps(
-        {"type": "LineString",
-         "coordinates": [
-             [
-                 -100.94238281249999,
-                 42.06560675405716
-             ],
-             [
-                 -93.515625,
-                 43.70759350405294
-             ]
-         ]}
-    ), {'bounds': ['bounds must be a polygon']})
+@pytest.mark.parametrize('bounds', [
+    ('foobar'),
+    ({})
 ])
-def test_bad_bounds(bounds, message):
-    metadata = {'type_': 'raster',
-                'crs': '',
-                'nativeBounds': {}}
+def test_bad_bounds(bounds):
+    metadata = {'crs': '', 'nativeBounds': {}}
     metadata['bounds'] = bounds
     schema = BaseSchema()
-    with pytest.raises(ValidationError) as exception:
+    with pytest.raises(ValidationError):
         schema.load(metadata)
-    assert exception.value.message == message
