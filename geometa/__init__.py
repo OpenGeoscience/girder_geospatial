@@ -1,6 +1,5 @@
 from shapely.geometry import Polygon, mapping
 from pyproj import Proj, transform
-import json
 
 
 class CannotHandleError(Exception):
@@ -16,6 +15,6 @@ def from_bounds_to_geojson(bounds, crs):
         xmax, ymax = transform(in_proj, out_proj,
                                bounds['right'], bounds['top'])
         wgs84_bounds = Polygon.from_bounds(xmin, ymin, xmax, ymax)
-        return json.dumps(mapping(wgs84_bounds))
+        return mapping(wgs84_bounds)
     except RuntimeError:
         return ''
