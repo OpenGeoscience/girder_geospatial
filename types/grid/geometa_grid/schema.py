@@ -4,7 +4,7 @@ from geometa import from_bounds_to_geojson, CannotHandleError
 import gdal
 import osr
 from shapely.geometry import Polygon
-from shapely.ops import cascaded_union
+from shapely.ops import unary_union
 
 
 class SubDatasets(fields.Field):
@@ -87,7 +87,7 @@ def handler(path):
                                                 i['nativeBounds']['right'],
                                                 i['nativeBounds']['top'])
                             for i in metadata['subDatasets']]
-        union = cascaded_union(subDatasetBounds)
+        union = unary_union(subDatasetBounds)
         bounds = {'left': union.bounds[0], 'right': union.bounds[2],
                   'bottom': union.bounds[1], 'top': union.bounds[3]}
         metadata['crs'] = crs

@@ -3,7 +3,7 @@ from geometa.schema import BaseSchema
 from geometa import from_bounds_to_geojson, CannotHandleError
 import ogr
 from shapely.geometry import Polygon
-from shapely.ops import cascaded_union
+from shapely.ops import unary_union
 
 
 class Layers(fields.Field):
@@ -71,7 +71,7 @@ def handler(path):
                                            i['nativeBounds']['right'],
                                            i['nativeBounds']['top'])
                        for i in metadata['layerInfo']]
-        union = cascaded_union(layerBounds)
+        union = unary_union(layerBounds)
         layer = dataset.GetLayer(0)
         crs = layer.GetSpatialRef().ExportToProj4()
         bounds = {'left': union.bounds[0], 'right': union.bounds[2],
