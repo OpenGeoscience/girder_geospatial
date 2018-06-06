@@ -88,8 +88,8 @@ def handler(path):
                                                 i['nativeBounds']['top'])
                             for i in metadata['subDatasets']]
         union = cascaded_union(subDatasetBounds)
-        bounds = {'left': union.bounds[0], 'right': union.bounds[1],
-                  'bottom': union.bounds[2], 'top': union.bounds[3]}
+        bounds = {'left': union.bounds[0], 'right': union.bounds[2],
+                  'bottom': union.bounds[1], 'top': union.bounds[3]}
         metadata['crs'] = crs
         metadata['type_'] = 'grid'
         metadata['driver'] = dataset.GetDriver().LongName
