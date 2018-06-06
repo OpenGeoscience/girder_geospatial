@@ -2,7 +2,7 @@ import json
 import os
 import pytest
 from pytest_girder.assertions import assertStatusOk
-from girder.models.file import File
+from girder.models.item import Item
 
 
 @pytest.mark.plugin('geometa')
@@ -20,7 +20,7 @@ def test_vector_geometa(server, admin, fsAssetstore, testFile, expected):
 
     with open(testFile, 'rb') as f:
         uploadedFile = server.uploadFile(name, f.read(), admin, public.json[0])
-        document = File().load(uploadedFile['_id'], user=admin)
+        document = Item().load(uploadedFile['itemId'], user=admin)
 
     with open(expected) as f:
         expectedJson = json.load(f)
