@@ -74,8 +74,8 @@ def handler(path):
         union = cascaded_union(layerBounds)
         layer = dataset.GetLayer(0)
         crs = layer.GetSpatialRef().ExportToProj4()
-        bounds = {'left': union.bounds[0], 'right': union.bounds[1],
-                  'bottom': union.bounds[2], 'top': union.bounds[3]}
+        bounds = {'left': union.bounds[0], 'right': union.bounds[2],
+                  'bottom': union.bounds[1], 'top': union.bounds[3]}
         metadata['crs'] = crs
         metadata['nativeBounds'] = bounds
         metadata['type_'] = 'vector'
