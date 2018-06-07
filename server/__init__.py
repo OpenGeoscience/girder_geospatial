@@ -1,6 +1,7 @@
 import pkg_resources
 from girder import events
 from girder.models.file import File
+from girder.models.item import Item
 from girder.models.assetstore import Assetstore
 from girder.utility import assetstore_utilities
 from girder.utility._cache import cache
@@ -23,14 +24,15 @@ def get_handlers():
 def upload_handler(event):
     _id = event.info['file']['_id']
     girder_file = File().load(_id, force=True)
+    girder_item = Item().load(event.info['file']['itemId'], force=True)
     path = _get_girder_path(girder_file)
     for entry_point_name, entry_point in get_handlers().items():
         try:
             metadata = entry_point(path)
             schema = BaseSchema()
             schema.load(metadata)
-            girder_file['geometa'] = metadata
-            File().save(girder_file)
+            girder_item['geometa'] = metadata
+            Item().save(girder_item)
         except CannotHandleError:
             pass
 
