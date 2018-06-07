@@ -7,6 +7,7 @@ from girder.utility import assetstore_utilities
 from girder.utility._cache import cache
 from geometa.schema import BaseSchema
 from geometa import CannotHandleError
+from .rest import geometa_handler
 
 
 def _get_girder_path(girder_file):
@@ -39,3 +40,4 @@ def upload_handler(event):
 
 def load(info):
     events.bind('model.file.finalizeUpload.after', info['name'], upload_handler)
+    info['apiRoot'].item.route('GET', ('geometa',), geometa_handler)
