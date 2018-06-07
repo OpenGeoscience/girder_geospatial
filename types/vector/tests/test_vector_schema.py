@@ -41,7 +41,7 @@ def test_union_layer_bounds(server, admin, fsAssetstore):
 
     with open(testFile, 'rb') as f:
         uploadedFile = server.uploadFile(name, f.read(), admin, public.json[0])
-        document = File().load(uploadedFile['_id'], user=admin)
+        document = Item().load(uploadedFile['itemId'], user=admin)
 
     if document['geometa']['layers'] == 1:
         assert document['geometa']['bounds'] == document['geometa']['layerInfo'][0]['bounds']
