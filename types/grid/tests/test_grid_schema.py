@@ -25,3 +25,22 @@ def test_grid_geometa(server, admin, fsAssetstore, testFile, expected):
         expectedJson = json.load(f)
 
     assert list(document['geometa']).sort() == list(expectedJson).sort()
+
+
+@pytest.mark.plugin('geometa')
+def test_union_subdataset_bounds(server, admin, fsAssetstore):
+    testFile = 'tests/data/sresa1b_ncar_ccsm3-example.nc'
+    name = os.path.basename(testFile)
+
+    public = server.request(path='/folder', user=admin, method='GET',
+                            params={'parentId': admin['_id'],
+                                    'parentType': 'user',
+                                    'name': 'Public'})
+    assertStatusOk(public)
+
+    with open(testFile, 'rb') as f:
+        uploadedFile = server.uploadFile(name, f.read(), admin, public.json[0])
+        document = Item().load(uploadedFile['itemId'], user=admin)
+
+    if document['geometa']['subDatasets'] == 1:
+        assert document['geometa']['bounds'] == document['geometa']['subDatasetInfo'][0]['bounds']
