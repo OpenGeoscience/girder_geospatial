@@ -112,7 +112,11 @@ class OpenSearchGeoSchema(Schema):
         try:
             load_wkt(value)
         except WKTReadingError as e:
-            raise ValidationError(e.message)
+            try:
+                raise ValidationError(e.message)
+            # python3 hack for error message handling
+            except AttributeError:
+                raise ValidationError(str(e))
 
     def _key_should_exist_with_keys(self, context, key, keys):
         for i in keys:
