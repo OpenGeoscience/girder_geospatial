@@ -8,7 +8,7 @@ from girder.models.item import Item
 @pytest.mark.plugin('geometa')
 @pytest.mark.parametrize('testFile, expected', [
     ('tests/data/stations.geojson', 'tests/data/stations_geojson.json'),
-    ('tests/data/poly_non_conformant.gpkg', 'tests/data/poly_non_conformant_gpkg.json')
+    ('tests/data/geometries.kml', 'tests/data/geometries_kml.json')
 ])
 def test_vector_geometa(server, admin, fsAssetstore, testFile, expected):
     name = os.path.basename(testFile)
