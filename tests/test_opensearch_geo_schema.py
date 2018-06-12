@@ -7,7 +7,7 @@ import pytest
     {'latitude': 50},
     {'longitude': 50},
     {'radius': 50},
-    {'radius': 50, 'latitude': 50, 'longitude': 50},
+    {'radius': 50, 'latitude': 50, 'longitude': 50, 'relation': 'near'},
     {'bbox': '1,1,2,2'},
     {'geometry': 'foobar'},
     {'geometry': 'POINT(6 10)'},

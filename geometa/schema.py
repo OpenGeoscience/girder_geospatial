@@ -7,6 +7,9 @@ from marshmallow import fields, Schema, validates, validates_schema, ValidationE
 from marshmallow.validate import Range, OneOf
 
 
+GEOSPATIAL_FIELD = 'geometa.bounds'
+
+
 class Crs(fields.Field):
     def _deserialize(self, value, attr, obj):
         try:
@@ -28,20 +31,22 @@ class Bounds(fields.Field):
             raise ValidationError('bounds must be a valid geojson geometry')
 
 
-class Type_(fields.Field):
+class Relation(fields.Str):
     def _deserialize(self, value, att, obj):
-        if value in ['raster', 'vector', 'pointcloud', 'grid']:
-            return value
-        else:
-            message = 'type_ must be one of raster, vector, grid or pointcloud'
-            raise ValidationError(message)
+        relationMapping = {
+            'intersects': '$geoIntersects',
+            'within': '$geoWithin',
+            'near': '$near'}
+        return relationMapping[value]
 
 
 class BaseSchema(Schema):
     crs = Crs(required=True)
     nativeBounds = fields.Dict(required=True)
     bounds = Bounds(required=True)
-    type_ = Type_(required=True)
+    type_ = fields.Str(required=True, validate=OneOf(
+        ['raster', 'vector', 'pointcloud', 'grid'],
+        error='type_ must be one of raster, vector, grid or pointcloud'))
     date = fields.DateTime(default='')
     altitudeEllipsoid = fields.String()
     nativeAltitude = fields.List(fields.Float)
@@ -55,8 +60,8 @@ class OpenSearchGeoSchema(Schema):
             max=90,
             error='Latitude must be between -90, 90'),
         metadata={
-            'requires': ['longitude', 'radius', 'relation'],
-            'excludes': ['bbox', 'geometry']
+            'requires': ['longitude', 'radius'],
+            'excludes': ['bbox', 'geometry', 'relation']
         })
     longitude = fields.Number(
         validate=Range(
@@ -64,19 +69,19 @@ class OpenSearchGeoSchema(Schema):
             max=180,
             error='Longitude must be between -180, 180'),
         metadata={
-            'requires': ['latitude', 'radius', 'relation'],
-            'excludes': ['bbox', 'geometry']
+            'requires': ['latitude', 'radius'],
+            'excludes': ['bbox', 'geometry', 'relation']
         })
     radius = fields.Number(
         validate=Range(
             min=0,
             error='Radius must be a positive number'),
         metadata={
-            'requires': ['latitude', 'longitude', 'relation'],
-            'excludes': ['bbox', 'geometry']
+            'requires': ['latitude', 'longitude'],
+            'excludes': ['bbox', 'geometry', 'relation']
         })
-    relation = fields.String(validate=OneOf(
-        ['intersects', 'within', 'near'],
+    relation = Relation(validate=OneOf(
+        ['$geoIntersects', '$geoWithin', '$near'],
         error='Relation must be one of {choices}'))
     bbox = fields.String(
         metadata={
