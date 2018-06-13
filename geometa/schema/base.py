@@ -1,7 +1,7 @@
 import pyproj
 import json
 import geojson
-from marshmallow import fields, Schema, ValidationError, validates
+from marshmallow import fields, Schema, ValidationError
 from marshmallow.validate import OneOf
 
 

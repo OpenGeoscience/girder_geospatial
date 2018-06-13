@@ -2,6 +2,9 @@ from shapely.geometry import Polygon, mapping
 from pyproj import Proj, transform
 
 
+GEOSPATIAL_FIELD = 'geometa.bounds'
+
+
 class CannotHandleError(Exception):
     pass
 
