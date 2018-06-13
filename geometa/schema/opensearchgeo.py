@@ -1,34 +1,8 @@
-import json
-import pyproj
-import geojson
 from shapely.wkt import loads as load_wkt
 from shapely.geos import WKTReadingError
-from marshmallow import fields, Schema, validates, validates_schema, ValidationError
+from shapely.geometry import mapping
 from marshmallow.validate import Range, OneOf
-
-
-GEOSPATIAL_FIELD = 'geometa.bounds'
-
-
-class Crs(fields.Field):
-    def _deserialize(self, value, attr, obj):
-        try:
-            pyproj.Proj(value, errcheck=True)
-            return value
-        except RuntimeError:
-            return ''
-
-
-class Bounds(fields.Field):
-    def _deserialize(self, value, attr, obj):
-        try:
-            geojson_obj = geojson.loads(json.dumps(value))
-            if geojson_obj.is_valid and geojson_obj['type'] == 'Polygon':
-                return value
-            else:
-                raise ValidationError('bounds must be a polygon')
-        except AttributeError:
-            raise ValidationError('bounds must be a valid geojson geometry')
+from marshmallow import fields, Schema, validates_schema, ValidationError
 
 
 class Relation(fields.Str):
@@ -40,17 +14,30 @@ class Relation(fields.Str):
         return relationMapping[value]
 
 
-class BaseSchema(Schema):
-    crs = Crs(required=True)
-    nativeBounds = fields.Dict(required=True)
-    bounds = Bounds(required=True)
-    type_ = fields.Str(required=True, validate=OneOf(
-        ['raster', 'vector', 'pointcloud', 'grid'],
-        error='type_ must be one of raster, vector, grid or pointcloud'))
-    date = fields.DateTime(default='')
-    altitudeEllipsoid = fields.String()
-    nativeAltitude = fields.List(fields.Float)
-    altitude = fields.List(fields.Float)
+class Geometry(fields.Str):
+    def _deserialize(self, value, att, obj):
+        try:
+            geometry = load_wkt(value)
+            return mapping(geometry)
+        except WKTReadingError as e:
+            try:
+                raise ValidationError(e.message)
+            # python3 hack for error message handling
+            except AttributeError:
+                raise ValidationError(str(e))
+
+
+class Bbox(fields.Str):
+    def _deserialize(self, value, att, obj):
+        bbox = [float(i) for i in value.split(',')]
+        if len(bbox) != 4:
+            raise ValidationError('BBox should be in "Xmin, Ymin, Xmax, Ymax" format')
+        elif bbox[2] <= bbox[0]:
+            raise ValidationError('Xmax must be greater than Xmin')
+        elif bbox[3] <= bbox[1]:
+            raise ValidationError('Ymax must be greater than Ymin')
+        else:
+            return bbox
 
 
 class OpenSearchGeoSchema(Schema):
@@ -83,12 +70,12 @@ class OpenSearchGeoSchema(Schema):
     relation = Relation(validate=OneOf(
         ['$geoIntersects', '$geoWithin', '$near'],
         error='Relation must be one of {choices}'))
-    bbox = fields.String(
+    bbox = Bbox(
         metadata={
-            'requires': ['relation'],
-            'excludes': ['latitude', 'longitude', 'radius', 'geometry']
+            'requires': [],
+            'excludes': ['latitude', 'longitude', 'radius', 'geometry', 'relation']
         })
-    geometry = fields.String(
+    geometry = Geometry(
         metadata={
             'requires': ['relation'],
             'excludes': ['latitude', 'longitude', 'radius', 'bbox']
@@ -101,27 +88,6 @@ class OpenSearchGeoSchema(Schema):
         metadata={
             'requires': ['start']
         })
-
-    @validates('bbox')
-    def validate_bbox(self, value):
-        bbox = [float(i) for i in value.split(',')]
-        if len(bbox) != 4:
-            raise ValidationError('BBox should be in "Xmin, Ymin, Xmax, Ymax" format')
-        elif bbox[2] <= bbox[0]:
-            raise ValidationError('Xmax must be greater than Xmin')
-        elif bbox[3] <= bbox[1]:
-            raise ValidationError('Ymax must be greater than Ymin')
-
-    @validates('geometry')
-    def validate_geometry(self, value):
-        try:
-            load_wkt(value)
-        except WKTReadingError as e:
-            try:
-                raise ValidationError(e.message)
-            # python3 hack for error message handling
-            except AttributeError:
-                raise ValidationError(str(e))
 
     def _key_should_exist_with_keys(self, context, key, keys):
         for i in keys:
