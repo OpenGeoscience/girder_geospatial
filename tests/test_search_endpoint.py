@@ -22,9 +22,26 @@ def test_empty_params(server, admin):
 
 @pytest.mark.plugin('geometa')
 @pytest.mark.parametrize('params, expected', [
-    ({'geometry': 'POLYGON ((-82.353515625 34.415973384481866, -68.7744140625 34.415973384481866, \
-    -68.7744140625 41.244772343082076, -82.353515625 41.244772343082076, -82.353515625 34.415973384481866))',
-     'relation': 'intersects'}, ['stations.geojson', 'sresa1b_ncar_ccsm3-example.nc'])
+    (
+        {'geometry': 'POLYGON ((-82.353515625 34.415973384481866, -68.7744140625 34.415973384481866, \
+        -68.7744140625 41.244772343082076, -82.353515625 41.244772343082076, -82.353515625 34.415973384481866))',
+         'relation': 'intersects'},
+        ['stations.geojson', 'sresa1b_ncar_ccsm3-example.nc']
+    ),
+    (
+        {'bbox': '-82.353515625, 34.415973384481866, -68.7744140625, 41.244772343082076',
+         'relation': 'intersects'},
+        ['stations.geojson', 'sresa1b_ncar_ccsm3-example.nc']
+    ),
+    (
+        {'bbox': '-82.353515625, 34.415973384481866, -68.7744140625, 41.244772343082076',
+         'relation': 'within'},
+        ['stations.geojson']
+    ),
+    (
+        {'longitude': -82.353515625, 'latitude': 34.415973384481866, 'radius': 1000000},
+        ['stations.geojson']
+    )
 ])
 def test_geospatial_query(server, admin, fsAssetstore, params, expected):
     public = server.request(path='/folder', user=admin,
