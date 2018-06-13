@@ -1,6 +1,6 @@
 from shapely.wkt import loads as load_wkt
 from shapely.geos import WKTReadingError
-from shapely.geometry import mapping
+from shapely.geometry import mapping, Polygon
 from marshmallow.validate import Range, OneOf
 from marshmallow import fields, Schema, validates_schema, ValidationError
 
@@ -9,8 +9,7 @@ class Relation(fields.Str):
     def _deserialize(self, value, att, obj):
         relationMapping = {
             'intersects': '$geoIntersects',
-            'within': '$geoWithin',
-            'near': '$near'}
+            'within': '$geoWithin'}
         return relationMapping[value]
 
 
@@ -36,8 +35,8 @@ class Bbox(fields.Str):
             raise ValidationError('Xmax must be greater than Xmin')
         elif bbox[3] <= bbox[1]:
             raise ValidationError('Ymax must be greater than Ymin')
-        else:
-            return bbox
+        geometry = Polygon.from_bounds(*bbox)
+        return mapping(geometry)
 
 
 class OpenSearchGeoSchema(Schema):
@@ -68,12 +67,12 @@ class OpenSearchGeoSchema(Schema):
             'excludes': ['bbox', 'geometry', 'relation']
         })
     relation = Relation(validate=OneOf(
-        ['$geoIntersects', '$geoWithin', '$near'],
+        ['$geoIntersects', '$geoWithin'],
         error='Relation must be one of {choices}'))
     bbox = Bbox(
         metadata={
-            'requires': [],
-            'excludes': ['latitude', 'longitude', 'radius', 'geometry', 'relation']
+            'requires': ['relation'],
+            'excludes': ['latitude', 'longitude', 'radius', 'geometry']
         })
     geometry = Geometry(
         metadata={
