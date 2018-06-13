@@ -8,39 +8,36 @@ from geometa import GEOSPATIAL_FIELD
 from marshmallow import ValidationError
 
 
-def _find(user, query, limit, offset, sort):
-    """
-    Helper to search the geospatial data of items and return the filtered
-    fields and geospatial data of the matching items.
-
-    :param query: geospatial search query.
-    :type query: dict[str, unknown]
-    :param limit: maximum number of matching items to return.
-    :type limit: int
-    :param offset: offset of matching items to return.
-    :type offset: int
-    :param sort: field by which to sort the matching items
-    :type sort: str
-    :returns: filtered fields of the matching items with geospatial data
-             appended to the 'geo' field of each item.
-    :rtype : list[dict[str, unknown]]
-    """
-    cursor = Item().find(query, sort=sort)
+def _find(user, query):
+    cursor = Item().find(query)
 
     return list(Item().filterResultsByPermission(
-        cursor, user, AccessType.READ, limit, offset))
+        cursor, user, AccessType.READ))
 
 
-def intersects(user, geometry, limit=1000, offset=0, sort=None):
+def get_documents_by_geometry(user, geometry, relation):
     query = {
         GEOSPATIAL_FIELD: {
-            '$geoIntersects': {
+            relation: {
                 '$geometry': geometry
             }
         }
     }
 
-    return _find(user, query, limit, offset, sort)
+    return _find(user, query)
+
+
+def get_documents_by_radius(user, latitude, longitude, radius):
+    RADIUS_OF_EARTH = 6378137.0  # average in meters
+    query = {
+        GEOSPATIAL_FIELD: {
+            '$geoWithin': {'$centerSphere': [
+                [longitude, latitude],
+                radius / RADIUS_OF_EARTH]}
+        }
+    }
+
+    return _find(user, query)
 
 
 @access.public
@@ -55,6 +52,11 @@ def geometa_handler(self, params):
     user = self.getCurrentUser()
 
     if 'geometry' in params:
-        return intersects(user, params['geometry'])
+        return get_documents_by_geometry(user, params['geometry'], params['relation'])
+    elif 'bbox' in params:
+        return get_documents_by_geometry(user, params['bbox'], params['relation'])
+    elif 'latitude' in params:
+        return get_documents_by_radius(user, params['latitude'],
+                                       params['longitude'], params['radius'])
     else:
         return {}
