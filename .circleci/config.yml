@@ -1,0 +1,48 @@
+initialize-venv: &initialize-venv
+  name: Initialize Virtual Environment
+  command: |
+    python -m virtualenv ../venv || python -m venv ../venv
+    . ../venv/bin/activate
+
+ci-steps: &ci-steps
+  steps:
+    - checkout:
+        path: ~/geometa
+    - run:
+        <<: *initialize-venv
+    - run:
+        name: Run the tests
+        command: |
+          mongod > /dev/null 2>&1 &
+          tox -e $TEST_TOX_ENV -c ~/geometa
+
+version: 2
+jobs:
+  python27:
+    docker:
+      - image: dozturk2/girder_geospatial
+    environment:
+     - TEST_TOX_ENV: "py27"
+    <<: *ci-steps
+
+  python35:
+    docker:
+      - image: dozturk2/girder_geospatial
+    environment:
+     - TEST_TOX_ENV: "py35"
+    <<: *ci-steps
+
+  python36:
+    docker:
+      - image: dozturk2/girder_geospatial
+    environment:
+     - TEST_TOX_ENV: "py36"
+    <<: *ci-steps
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - python27
+      - python35
+      - python36
