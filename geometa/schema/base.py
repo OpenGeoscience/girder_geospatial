@@ -1,7 +1,8 @@
-import json
-from marshmallow import Schema, fields, ValidationError
 import pyproj
+import json
 import geojson
+from marshmallow import fields, Schema, ValidationError
+from marshmallow.validate import OneOf
 
 
 class Crs(fields.Field):
@@ -25,21 +26,14 @@ class Bounds(fields.Field):
             raise ValidationError('bounds must be a valid geojson geometry')
 
 
-class Type_(fields.Field):
-    def _deserialize(self, value, att, obj):
-        if value in ['raster', 'vector', 'pointcloud', 'grid']:
-            return value
-        else:
-            message = 'type_ must be one of raster, vector, grid or pointcloud'
-            raise ValidationError(message)
-
-
 class BaseSchema(Schema):
     crs = Crs(required=True)
     nativeBounds = fields.Dict(required=True)
     bounds = Bounds(required=True)
-    type_ = Type_(required=True)
-    date = fields.Date(default='')
+    type_ = fields.Str(required=True, validate=OneOf(
+        ['raster', 'vector', 'pointcloud', 'grid'],
+        error='type_ must be one of raster, vector, grid or pointcloud'))
+    date = fields.DateTime(default='')
     altitudeEllipsoid = fields.String()
     nativeAltitude = fields.List(fields.Float)
     altitude = fields.List(fields.Float)

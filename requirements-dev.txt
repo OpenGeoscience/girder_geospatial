@@ -1,4 +1,5 @@
 pytest==3.5.1
 pytest-cov==2.5.1
+pytest-xdist==1.22.2
 tox==3.0.0
 git+https://github.com/girder/girder.git@pytest-girder-file-upload#subdirectory=pytest_girder

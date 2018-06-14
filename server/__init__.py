@@ -6,7 +6,9 @@ from girder.models.assetstore import Assetstore
 from girder.utility import assetstore_utilities
 from girder.utility._cache import cache
 from geometa.schema import BaseSchema
+from geometa import GEOSPATIAL_FIELD
 from geometa import CannotHandleError
+from .rest import geometa_handler
 
 
 def _get_girder_path(girder_file):
@@ -33,9 +35,11 @@ def upload_handler(event):
             schema.load(metadata)
             girder_item['geometa'] = metadata
             Item().save(girder_item)
+            Item().collection.create_index([(GEOSPATIAL_FIELD, "2dsphere")])
         except CannotHandleError:
             pass
 
 
 def load(info):
     events.bind('model.file.finalizeUpload.after', info['name'], upload_handler)
+    info['apiRoot'].item.route('GET', ('geometa',), geometa_handler)
