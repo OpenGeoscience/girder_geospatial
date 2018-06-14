@@ -6,35 +6,35 @@ initialize-venv: &initialize-venv
 
 ci-steps: &ci-steps
   steps:
-    - checkout
+    - checkout:
+        path: ~/geometa
     - run:
         <<: *initialize-venv
     - run:
         name: Run the tests
         command: |
-          . ../venv/bin/activate
-          pip install tox
-          tox -e $TEST_TOX_ENV
+          mongod > /dev/null 2>&1 &
+          tox -e $TEST_TOX_ENV -c ~/geometa
 
 version: 2
 jobs:
   python27:
     docker:
-      - image: circleci/python:2.7.14-jessie
+      - image: dozturk2/girder_geospatial
     environment:
      - TEST_TOX_ENV: "py27"
     <<: *ci-steps
 
   python35:
     docker:
-      - image: circleci/python:3.5.4-jessie
+      - image: dozturk2/girder_geospatial
     environment:
      - TEST_TOX_ENV: "py35"
     <<: *ci-steps
 
   python36:
     docker:
-      - image: circleci/python:3.6.3-jessie
+      - image: dozturk2/girder_geospatial
     environment:
      - TEST_TOX_ENV: "py36"
     <<: *ci-steps
