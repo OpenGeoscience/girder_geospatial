@@ -31,7 +31,8 @@ def test_crs(crs, expected):
 @pytest.mark.parametrize('metadata', [
     ({'nativeBounds': '', 'type_': 'raster', 'bounds': sampleBounds()}),
     ({'crs': '', 'nativeBounds': '', 'bounds': sampleBounds()}),
-    ({'crs': '', 'nativeBounds': '', 'type_': 'raster', 'bounds': sampleBounds()},
+    ({'crs': '', 'nativeBounds': '', 'type_': 'raster',
+      'bounds': sampleBounds()},
      {'crs': '', 'type_': 'raster', 'bounds': sampleBounds()})
 ])
 def test_schema_with_missing_variables(metadata):

@@ -47,12 +47,14 @@ def get_layer_info(layer):
     definition = layer.GetLayerDefn()
     count = definition.GetFieldCount()
     metadata['geomType'] = ogr.GeometryTypeToName(definition.GetGeomType())
-    metadata['layerFields'] = [get_field_info(definition.GetFieldDefn(i)) for i in range(count)]
+    metadata['layerFields'] = [get_field_info(definition.GetFieldDefn(i))
+                               for i in range(count)]
     return metadata
 
 
 def get_layers(dataset):
-    return [get_layer_info(dataset.GetLayer(i)) for i in range(dataset.GetLayerCount())]
+    return [get_layer_info(dataset.GetLayer(i))
+            for i in range(dataset.GetLayerCount())]
 
 
 def handler(path):

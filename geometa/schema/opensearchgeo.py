@@ -30,11 +30,14 @@ class Bbox(fields.Str):
     def _deserialize(self, value, att, obj):
         bbox = [float(i) for i in value.split(',')]
         if len(bbox) != 4:
-            raise ValidationError('BBox should be in "Xmin, Ymin, Xmax, Ymax" format')
+            message = 'BBox should be in "Xmin, Ymin, Xmax, Ymax" format'
+            raise ValidationError(message)
         elif bbox[2] <= bbox[0]:
-            raise ValidationError('Xmax must be greater than Xmin')
+            message = 'Xmax must be greater than Xmin'
+            raise ValidationError(message)
         elif bbox[3] <= bbox[1]:
-            raise ValidationError('Ymax must be greater than Ymin')
+            message = 'Ymax must be greater than Ymin'
+            raise ValidationError(message)
         geometry = Polygon.from_bounds(*bbox)
         return mapping(geometry)
 
@@ -91,19 +94,23 @@ class OpenSearchGeoSchema(Schema):
     def _key_should_exist_with_keys(self, context, key, keys):
         for i in keys:
             if i not in context:
-                raise ValidationError('{} should be provided with {}.'.format(key, keys))
+                message = '{} should be provided with {}.'.format(key, keys)
+                raise ValidationError(message)
 
     def _key_should_not_exist_with_keys(self, context, key, keys):
         for i in keys:
             if i in context:
-                raise ValidationError('{} and {} are mutually exclusive.'.format(key, keys))
+                message = '{} and {} are mutually exclusive.'.format(key, keys)
+                raise ValidationError(message)
 
     @validates_schema
     def validate_search_parameters(self, data):
         for key in data.keys():
             try:
                 metadata = self.fields[key].metadata['metadata']
-                self._key_should_exist_with_keys(data, key, metadata['requires'])
-                self._key_should_not_exist_with_keys(data, key, metadata['excludes'])
+                self._key_should_exist_with_keys(data, key,
+                                                 metadata['requires'])
+                self._key_should_not_exist_with_keys(data, key,
+                                                     metadata['excludes'])
             except KeyError:
                 pass

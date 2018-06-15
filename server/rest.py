@@ -52,9 +52,13 @@ def geometa_handler(self, params):
     user = self.getCurrentUser()
 
     if 'geometry' in params:
-        return get_documents_by_geometry(user, params['geometry'], params['relation'])
+        return get_documents_by_geometry(user,
+                                         params['geometry'],
+                                         params['relation'])
     elif 'bbox' in params:
-        return get_documents_by_geometry(user, params['bbox'], params['relation'])
+        return get_documents_by_geometry(user,
+                                         params['bbox'],
+                                         params['relation'])
     elif 'latitude' in params:
         return get_documents_by_radius(user, params['latitude'],
                                        params['longitude'], params['radius'])

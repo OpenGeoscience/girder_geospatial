@@ -7,7 +7,8 @@ from girder.models.item import Item
 
 @pytest.mark.plugin('geometa')
 @pytest.mark.parametrize('testFile, expected', [
-    ('tests/data/sresa1b_ncar_ccsm3-example.nc', 'tests/data/sresa1b_ncar_ccsm3-example_nc.json')
+    ('tests/data/sresa1b_ncar_ccsm3-example.nc',
+     'tests/data/sresa1b_ncar_ccsm3-example_nc.json')
 ])
 def test_grid_geometa(server, admin, fsAssetstore, testFile, expected):
     name = os.path.basename(testFile)
@@ -43,4 +44,5 @@ def test_union_subdataset_bounds(server, admin, fsAssetstore):
         document = Item().load(uploadedFile['itemId'], user=admin)
 
     if document['geometa']['subDatasets'] == 1:
-        assert document['geometa']['bounds'] == document['geometa']['subDatasetInfo'][0]['bounds']
+        expected = document['geometa']['subDatasetInfo'][0]['bounds']
+        assert document['geometa']['bounds'] == expected

@@ -47,8 +47,8 @@ def get_projection_as_proj4(dataset):
 
 def get_subdataset_info(subDataset):
     dataset = gdal.Open(subDataset)
-
-    crs = get_projection_as_proj4(dataset) or '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
+    wgs84 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
+    crs = get_projection_as_proj4(dataset) or wgs84
     metadata = {}
     bounds = get_bounds(dataset)
     metadata['crs'] = crs
@@ -79,7 +79,8 @@ def handler(path):
         except IndexError:
             raise CannotHandleError('Does not have subdatasets')
         dataset = gdal.Open(main_dataset.GetSubDatasets()[0][0])
-        crs = get_projection_as_proj4(dataset) or '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
+        wgs84 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
+        crs = get_projection_as_proj4(dataset) or wgs84
         metadata = {}
         metadata['subDatasets'] = get_subdatasets(main_dataset)
         subDatasetBounds = [Polygon.from_bounds(i['nativeBounds']['left'],
