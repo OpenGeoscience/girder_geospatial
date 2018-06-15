@@ -9,6 +9,7 @@ import pytest
     {'radius': 50},
     {'radius': 50, 'latitude': 50, 'longitude': 50, 'relation': 'intersects'},
     {'bbox': '1,1,2,2'},
+    {'relation': 'intersects', 'geojson': 'foobar'},
     {'geometry': 'foobar'},
     {'geometry': 'POINT(6 10)'},
     {'geometry': 'POINT(6 10)', 'bbox': '1,1,2,2'},
