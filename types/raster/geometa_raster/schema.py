@@ -25,7 +25,8 @@ def get_band_info(dataset):
     for i in range(dataset.RasterCount):
         band_info = {}
         band = dataset.GetRasterBand(i+1)
-        colorInterp = gdal.GetColorInterpretationName(band.GetColorInterpretation())
+        color = band.GetColorInterpretation()
+        colorInterp = gdal.GetColorInterpretationName(color)
         band_info['dataType'] = gdal.GetDataTypeName(band.DataType)
         band_info['colorInterpretation'] = colorInterp
         band_info['scale'] = band.GetScale()

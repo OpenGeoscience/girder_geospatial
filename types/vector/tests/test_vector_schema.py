@@ -44,4 +44,5 @@ def test_union_layer_bounds(server, admin, fsAssetstore):
         document = Item().load(uploadedFile['itemId'], user=admin)
 
     if document['geometa']['layers'] == 1:
-        assert document['geometa']['bounds'] == document['geometa']['layerInfo'][0]['bounds']
+        expected = document['geometa']['layerInfo'][0]['bounds']
+        assert document['geometa']['bounds'] == expected

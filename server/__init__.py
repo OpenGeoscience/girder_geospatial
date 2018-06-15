@@ -41,5 +41,6 @@ def upload_handler(event):
 
 
 def load(info):
-    events.bind('model.file.finalizeUpload.after', info['name'], upload_handler)
+    events.bind('model.file.finalizeUpload.after',
+                info['name'], upload_handler)
     info['apiRoot'].item.route('GET', ('geometa',), geometa_handler)
