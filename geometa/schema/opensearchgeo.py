@@ -1,3 +1,6 @@
+import ast
+import json
+import geojson
 from shapely.wkt import loads as load_wkt
 from shapely.geos import WKTReadingError
 from shapely.geometry import mapping, Polygon
@@ -26,6 +29,18 @@ class Geometry(fields.Str):
                 raise ValidationError(str(e))
 
 
+class Geojson(fields.Str):
+    def _deserialize(self, value, att, obj):
+        try:
+            geojson_object = geojson.loads(json.dumps(ast.literal_eval(value)))
+            if not geojson_object.is_valid:
+                raise ValidationError('Invalid geojson is given')
+            else:
+                return geojson_object
+        except ValueError:
+            raise ValidationError('Invalid geojson is given')
+
+
 class Bbox(fields.Str):
     def _deserialize(self, value, att, obj):
         bbox = [float(i) for i in value.split(',')]
@@ -51,7 +66,8 @@ class OpenSearchGeoSchema(Schema):
         metadata={
             'requires': ['longitude', 'radius'],
             'excludes': ['bbox', 'geometry', 'relation']
-        })
+        }
+    )
     longitude = fields.Number(
         validate=Range(
             min=-180,
@@ -60,7 +76,8 @@ class OpenSearchGeoSchema(Schema):
         metadata={
             'requires': ['latitude', 'radius'],
             'excludes': ['bbox', 'geometry', 'relation']
-        })
+        }
+    )
     radius = fields.Number(
         validate=Range(
             min=0,
@@ -68,28 +85,40 @@ class OpenSearchGeoSchema(Schema):
         metadata={
             'requires': ['latitude', 'longitude'],
             'excludes': ['bbox', 'geometry', 'relation']
-        })
+        }
+    )
     relation = Relation(validate=OneOf(
         ['$geoIntersects', '$geoWithin'],
-        error='Relation must be one of {choices}'))
+        error='Relation must be one of {choices}')
+    )
     bbox = Bbox(
         metadata={
             'requires': ['relation'],
             'excludes': ['latitude', 'longitude', 'radius', 'geometry']
-        })
+        }
+    )
     geometry = Geometry(
         metadata={
             'requires': ['relation'],
-            'excludes': ['latitude', 'longitude', 'radius', 'bbox']
-        })
+            'excludes': ['latitude', 'longitude', 'radius', 'bbox', 'geojson']
+        }
+    )
+    geojson = Geojson(
+        metadata={
+            'requires': ['relation'],
+            'excludes': ['latitude', 'longitude', 'radius', 'bbox', 'geometry']
+        }
+    )
     start = fields.DateTime(
         metadata={
             'requires': ['end']
-        })
+        }
+    )
     end = fields.DateTime(
         metadata={
             'requires': ['start']
-        })
+        }
+    )
 
     def _key_should_exist_with_keys(self, context, key, keys):
         for i in keys:
