@@ -62,5 +62,10 @@ def geometa_handler(self, params):
     elif 'latitude' in params:
         return get_documents_by_radius(user, params['latitude'],
                                        params['longitude'], params['radius'])
+    elif 'geojson' in params:
+        return get_documents_by_geometry(user,
+                                         params['geojson'],
+                                         params['relation'])
+
     else:
         return {}
