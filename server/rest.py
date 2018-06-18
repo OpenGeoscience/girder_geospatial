@@ -2,7 +2,6 @@ import pkg_resources
 from girder.api import access
 from girder.api.describe import autoDescribeRoute, Description
 from girder.api.rest import boundHandler, filtermodel
-from girder.exceptions import ValidationException
 from girder.models.item import Item
 from girder.models.assetstore import Assetstore
 from girder.constants import AccessType
@@ -90,10 +89,7 @@ def geometa_create_handler(self, item):
 def geometa_search_handler(self, params):
     schema = OpenSearchGeoSchema()
     user = self.getCurrentUser()
-    try:
-        params = schema.load(params)
-    except ValidationError as e:
-        raise ValidationException(e.messages)
+    params = schema.load(params)
     user = self.getCurrentUser()
 
     if 'geometry' in params:
