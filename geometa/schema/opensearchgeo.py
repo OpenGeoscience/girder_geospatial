@@ -33,10 +33,11 @@ class Geojson(fields.Str):
     def _deserialize(self, value, att, obj):
         try:
             geojson_object = geojson.loads(json.dumps(ast.literal_eval(value)))
-            if not geojson_object.is_valid:
-                raise ValidationError('Invalid geojson is given')
-            else:
+            try:
+                geojson_object.is_valid
                 return geojson_object
+            except AttributeError:
+                raise ValidationError('Invalid geojson is given')
         except ValueError:
             raise ValidationError('Invalid geojson is given')
 
