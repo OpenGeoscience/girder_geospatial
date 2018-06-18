@@ -69,6 +69,7 @@ def create_geometa(girder_item, girder_file):
             Item().collection.create_index([(GEOSPATIAL_FIELD, "2dsphere")])
         except CannotHandleError:
             pass
+    return girder_item
 
 
 @access.public
@@ -81,7 +82,7 @@ def create_geometa(girder_item, girder_file):
 )
 def geometa_create_handler(self, item):
     girder_file = [i for i in Item().childFiles(item, limit=1)][0]
-    create_geometa(item, girder_file)
+    return create_geometa(item, girder_file)
 
 
 @access.public
