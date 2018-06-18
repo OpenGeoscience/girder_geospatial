@@ -9,7 +9,6 @@ from girder.utility import assetstore_utilities
 from girder.utility._cache import cache
 from geometa.schema import OpenSearchGeoSchema, BaseSchema
 from geometa import GEOSPATIAL_FIELD, CannotHandleError
-from marshmallow import ValidationError
 
 
 def _find(user, query):
@@ -91,22 +90,24 @@ def geometa_search_handler(self, params):
     user = self.getCurrentUser()
     params = schema.load(params)
     user = self.getCurrentUser()
+    documents = {}
 
     if 'geometry' in params:
-        return get_documents_by_geometry(user,
-                                         params['geometry'],
-                                         params['relation'])
+        documents = get_documents_by_geometry(user,
+                                              params['geometry'],
+                                              params['relation'])
     elif 'bbox' in params:
-        return get_documents_by_geometry(user,
-                                         params['bbox'],
-                                         params['relation'])
+        documents = get_documents_by_geometry(user,
+                                              params['bbox'],
+                                              params['relation'])
     elif 'latitude' in params:
-        return get_documents_by_radius(user, params['latitude'],
-                                       params['longitude'], params['radius'])
+        documents = get_documents_by_radius(user,
+                                            params['latitude'],
+                                            params['longitude'],
+                                            params['radius'])
     elif 'geojson' in params:
-        return get_documents_by_geometry(user,
-                                         params['geojson'],
-                                         params['relation'])
+        documents = get_documents_by_geometry(user,
+                                              params['geojson'],
+                                              params['relation'])
 
-    else:
-        return {}
+    return documents
