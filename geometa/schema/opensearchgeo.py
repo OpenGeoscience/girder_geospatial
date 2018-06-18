@@ -33,10 +33,11 @@ class Geojson(fields.Str):
     def _deserialize(self, value, att, obj):
         try:
             geojson_object = geojson.loads(json.dumps(ast.literal_eval(value)))
-            if not geojson_object.is_valid:
-                raise ValidationError('Invalid geojson is given')
-            else:
+            try:
+                geojson_object.is_valid
                 return geojson_object
+            except AttributeError:
+                raise ValidationError('Invalid geojson is given')
         except ValueError:
             raise ValidationError('Invalid geojson is given')
 
@@ -65,7 +66,7 @@ class OpenSearchGeoSchema(Schema):
             error='Latitude must be between -90, 90'),
         metadata={
             'requires': ['longitude', 'radius'],
-            'excludes': ['bbox', 'geometry', 'relation']
+            'excludes': ['bbox', 'geometry', 'relation', 'geojson']
         }
     )
     longitude = fields.Number(
@@ -75,7 +76,7 @@ class OpenSearchGeoSchema(Schema):
             error='Longitude must be between -180, 180'),
         metadata={
             'requires': ['latitude', 'radius'],
-            'excludes': ['bbox', 'geometry', 'relation']
+            'excludes': ['bbox', 'geometry', 'relation', 'geojson']
         }
     )
     radius = fields.Number(
@@ -84,7 +85,7 @@ class OpenSearchGeoSchema(Schema):
             error='Radius must be a positive number'),
         metadata={
             'requires': ['latitude', 'longitude'],
-            'excludes': ['bbox', 'geometry', 'relation']
+            'excludes': ['bbox', 'geometry', 'relation', 'geojson']
         }
     )
     relation = Relation(validate=OneOf(
@@ -94,7 +95,8 @@ class OpenSearchGeoSchema(Schema):
     bbox = Bbox(
         metadata={
             'requires': ['relation'],
-            'excludes': ['latitude', 'longitude', 'radius', 'geometry']
+            'excludes': ['latitude', 'longitude', 'radius',
+                         'geometry', 'geojson']
         }
     )
     geometry = Geometry(

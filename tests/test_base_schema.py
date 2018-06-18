@@ -70,7 +70,14 @@ def test_bad_type(type_):
 
 @pytest.mark.parametrize('bounds', [
     ('foobar'),
-    ({})
+    ({}),
+    ({
+        "type": "Point",
+        "coordinates": [
+            -97.734375,
+            40.17887331434696
+        ]
+    })
 ])
 def test_bad_bounds(bounds):
     metadata = {'crs': '', 'nativeBounds': {}}
@@ -78,3 +85,12 @@ def test_bad_bounds(bounds):
     schema = BaseSchema()
     with pytest.raises(ValidationError):
         schema.load(metadata)
+
+
+def test_bad_crs_string():
+    nativeBounds = {'left': 271785.000,
+                    'bottom': 4345785.000,
+                    'right': 506715.000,
+                    'top': 4584315.000}
+    badBounds = from_bounds_to_geojson(nativeBounds, 'foobar')
+    assert badBounds == ''
