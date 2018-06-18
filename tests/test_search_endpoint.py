@@ -45,6 +45,39 @@ def test_empty_params(server, admin):
         {'longitude': -82.353515625, 'latitude': 34.415973384481866,
          'radius': 1000000},
         ['stations.geojson']
+    ),
+    (
+        {
+            "geojson": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -101.77734374999999,
+                            31.653381399664
+                        ],
+                        [
+                            -27.59765625,
+                            31.653381399664
+                        ],
+                        [
+                            -27.59765625,
+                            57.79794388498275
+                        ],
+                        [
+                            -101.77734374999999,
+                            57.79794388498275
+                        ],
+                        [
+                            -101.77734374999999,
+                            31.653381399664
+                        ]
+                    ]
+                ]
+            },
+            "relation": "intersects"
+        },
+        ['stations.geojson', 'sresa1b_ncar_ccsm3-example.nc']
     )
 ])
 def test_geospatial_query(server, admin, fsAssetstore, params, expected):
