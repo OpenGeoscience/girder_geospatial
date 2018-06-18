@@ -4,7 +4,7 @@ setup(
     name='girder-plugin-geometa-raster',
     author='Kitware, Inc.',
     entry_points={
-        'geometa.formats': [
+        'geometa.types': [
             'raster=geometa_raster.schema:handler'
         ]
     },

@@ -8,7 +8,7 @@ setup(
         'geometa'
     ],
     entry_points={
-        'geometa.formats': []
+        'geometa.types': []
     },
     install_requires=[
         'pyproj',

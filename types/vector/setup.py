@@ -4,7 +4,7 @@ setup(
     name='girder-plugin-geometa-vector',
     author='Kitware, Inc.',
     entry_points={
-        'geometa.formats': [
+        'geometa.types': [
             'vector=geometa_vector.schema:handler'
         ]
     },
