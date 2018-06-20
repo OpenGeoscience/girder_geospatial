@@ -1,0 +1,78 @@
+- name: Tweak Girder server configurations
+  ini_file:
+    dest: "{{ girder_path }}/girder/conf/girder.local.cfg"
+    backup: yes
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+  with_items:
+    - { section: "global", option: "server.socket_host", value: '"0.0.0.0"' }
+    - { section: "cache", option: "enabled", value: "True"}
+    - { section: "cache", option: "cache.global.backend", value: '"dogpile.cache.memory"'}
+    - { section: "cache", option: "cache.request.backend", value: '"cherrypy_request"'}
+  become: yes
+
+- name: Restart Girder
+  service:
+    name: girder
+    state: restarted
+  become: yes
+  become_user: root
+
+- name: Wait for Girder to be available
+  wait_for:
+    port: 8080
+
+- name: Install web client
+  command: |
+    {{ girder_virtualenv }}/bin/girder-install web
+  become: yes
+
+- name: Install Girder-Client
+  pip:
+    name: "girder-client"
+  become: yes
+  become_user: root
+
+- name: Create Girder User
+  girder:
+    port: 8080
+    user:
+      firstName: "girder"
+      lastName: "girder"
+      login: "girder"
+      password: "girder"
+      email: "girder@girder.girder"
+      admin: yes
+      state: present
+
+- name: Enable geometa plugin
+  girder:
+    username: "girder"
+    password: "girder"
+    port: 8080
+    plugins:
+      - geometa
+    state: present
+
+- name: Restart Girder
+  service:
+    name: girder
+    state: restarted
+  become: yes
+  become_user: root
+
+- name: Wait for Girder to be available
+  wait_for:
+    port: 8080
+
+- name: Create filesystem assetstore
+  girder:
+    username: "girder"
+    password: "girder"
+    assetstore:
+      name: "Filesystem Assetstore"
+      type: "filesystem"
+      root: "/home/vagrant/assetstore"
+      current: true
+    state: present

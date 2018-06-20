@@ -1,0 +1,56 @@
+---
+- hosts: all
+
+  vars:
+    geometa_path: /home/vagrant/geometa
+    girder_plugins:
+      - path: "{{ geometa_path }}"
+        args: "-f"
+    girder_virtualenv: /home/vagrant/venvs/girder
+    girder_web: no
+
+  pre_tasks:
+    - name: Install required system packages
+      apt:
+        name: "{{ item }}"
+      with_items:
+        - mongodb
+        - npm
+        - python2.7-dev
+        - python-virtualenv
+        - libgdal-dev
+      become: yes
+
+    - name: Install gdal python bindings
+      environment:
+        CPLUS_INCLUDE_PATH: /usr/include/gdal
+        C_INCLUDE_PATH: /usr/include/gdal
+      pip:
+        name: gdal
+        version: 2.2.3
+        virtualenv: "{{ girder_virtualenv }}"
+
+    - name: Clone girder_geospatial
+      git:
+        repo: 'https://github.com/OpenGeoscience/girder_geospatial.git'
+        dest: "{{ geometa_path }}"
+
+    - name: Discover all geometa handlers
+      find:
+        paths: "{{ geometa_path }}/types"
+        file_type: directory
+      register: geometa_handlers
+
+    - name: Install geometa handlers
+      pip:
+        name: file://"{{ item.path }}"
+        virtualenv: "{{ girder_virtualenv }}"
+      with_items:
+        - "{{ geometa_handlers.files }}"
+
+  roles:
+    - role: girder.girder
+      become: yes
+
+  post_tasks:
+    - include: "post_tasks.yml"
