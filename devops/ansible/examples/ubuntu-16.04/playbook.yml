@@ -1,0 +1,72 @@
+---
+- hosts: all
+
+  vars:
+    geometa_path: /home/vagrant/geometa
+    girder_plugins:
+      - path: "{{ geometa_path }}"
+        args: "-f"
+    girder_virtualenv: /home/vagrant/venvs/girder
+    ansible_python_interpreter: /usr/bin/python3
+
+  pre_tasks:
+    - name: Install required system packages
+      apt:
+        name: python3-pip
+      become: yes
+
+    - name: Install python 3 virtualenv
+      pip:
+        name: virtualenv
+      become: yes
+
+    - name: Clone girder_geospatial
+      git:
+        repo: 'https://github.com/OpenGeoscience/girder_geospatial.git'
+        dest: "{{ geometa_path }}"
+
+    - name: Add ubuntu-gis ppa
+      apt_repository:
+        repo: ppa:ubuntugis/ppa
+      become: yes
+
+    - name: Install gdal
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+      with_items:
+        - libgdal-dev
+        - gdal-bin
+        - python3-gdal
+      become: yes
+
+    - name: Install gdal python bindings
+      environment:
+        CPLUS_INCLUDE_PATH: /usr/include/gdal
+        C_INCLUDE_PATH: /usr/include/gdal
+      pip:
+        name: gdal
+        version: 2.1.3
+        virtualenv: "{{ girder_virtualenv }}"
+
+    - name: Discover all geometa handlers
+      find:
+        paths: "{{ geometa_path }}/types"
+        file_type: directory
+      register: geometa_handlers
+
+    - name: Install geometa handlers
+      pip:
+        name: file://"{{ item.path }}"
+        virtualenv: "{{ girder_virtualenv }}"
+      with_items:
+        - "{{ geometa_handlers.files }}"
+
+  roles:
+    - role: greendayonfire.mongodb
+      become: yes
+    - role: girder.girder
+      become: yes
+
+  post_tasks:
+    - include: "post_tasks.yml"
