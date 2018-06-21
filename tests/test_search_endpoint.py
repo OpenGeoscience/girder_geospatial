@@ -1,17 +1,5 @@
-import os
-import glob
 import pytest
-from pytest_girder.assertions import assertStatusOk
-
-
-def upload_sample_data(server, admin, public):
-    testPath = 'tests/data/*'
-    testFiles = [i for i in glob.glob(testPath) if not i.endswith('.json')]
-
-    for testFile in testFiles:
-        name = os.path.basename(testFile)
-        with open(testFile, 'rb') as f:
-            server.uploadFile(name, f.read(), admin, public.json[0])
+from .utils import uploadSampleData
 
 
 @pytest.mark.plugin('geometa')
@@ -81,11 +69,6 @@ def test_empty_params(server, admin):
     )
 ])
 def test_geospatial_query(server, admin, fsAssetstore, params, expected):
-    public = server.request(path='/folder', user=admin,
-                            params={'parentId': admin['_id'],
-                                    'parentType': 'user',
-                                    'name': 'Public'})
-    assertStatusOk(public)
-    upload_sample_data(server, admin, public)
+    uploadSampleData(server, admin, 'tests/data/*')
     resp = server.request(path='/item/geometa', user=admin, params=params)
     assert sorted([i['lowerName'] for i in resp.json]) == sorted(expected)
