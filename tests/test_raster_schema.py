@@ -1,8 +1,7 @@
 import json
-import os
 import pytest
-from pytest_girder.assertions import assertStatusOk
 from girder.models.item import Item
+from .utils import uploadSampleData
 
 
 @pytest.mark.plugin('geometa')
@@ -13,17 +12,8 @@ from girder.models.item import Item
     ('tests/data/rgb.ntf', 'tests/data/rgb_ntf.json')
 ])
 def test_raster_geometa(server, admin, fsAssetstore, testFile, expected):
-    name = os.path.basename(testFile)
-    public = server.request(path='/folder', user=admin, method='GET',
-                            params={'parentId': admin['_id'],
-                                    'parentType': 'user',
-                                    'name': 'Public'})
-    assertStatusOk(public)
-
-    with open(testFile, 'rb') as f:
-        uploadedFile = server.uploadFile(name, f.read(), admin, public.json[0])
-        document = Item().load(uploadedFile['itemId'], user=admin)
-
+    uploaded = uploadSampleData(server, admin, testFile)[0]
+    document = Item().load(uploaded['itemId'], user=admin)
     with open(expected) as f:
         expectedJson = json.load(f)
 
