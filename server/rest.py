@@ -55,19 +55,40 @@ def get_type_handlers():
     return {e.name: e.load() for e in entry_points}
 
 
-def create_geometa(girder_item, girder_file):
+def get_geometa(girder_item, girder_file):
     path = _get_girder_path(girder_file)
+    metadata = {}
     for entry_point_name, entry_point in get_type_handlers().items():
         try:
             metadata = entry_point(path)
-            schema = BaseSchema()
-            schema.load(metadata)
-            girder_item['geometa'] = metadata
-            Item().save(girder_item)
-            Item().collection.create_index([(GEOSPATIAL_FIELD, "2dsphere")])
         except CannotHandleError:
             pass
+
+    return metadata
+
+
+def create_geometa(girder_item, girder_file):
+    metadata = get_geometa(girder_item, girder_file)
+    if metadata:
+        schema = BaseSchema()
+        schema.load(metadata)
+        girder_item['geometa'] = metadata
+        Item().save(girder_item)
+        Item().collection.create_index([(GEOSPATIAL_FIELD, "2dsphere")])
+
     return girder_item
+
+
+@access.public
+@boundHandler
+@autoDescribeRoute(
+    Description('Get geospatial metadata for a given item')
+    .modelParam('id', 'The ID of the item that will have geospatial metadata.',
+                model=Item, level=AccessType.READ)
+)
+def geometa_get_handler(self, item):
+    girder_file = [i for i in Item().childFiles(item, limit=1)][0]
+    return get_geometa(item, girder_file)
 
 
 @access.public

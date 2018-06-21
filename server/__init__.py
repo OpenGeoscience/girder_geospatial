@@ -1,8 +1,8 @@
 from girder import events
 from girder.models.file import File
 from girder.models.item import Item
-from .rest import geometa_search_handler, geometa_create_handler
-from .rest import create_geometa
+from .rest import (geometa_search_handler, geometa_create_handler,
+                   geometa_get_handler, create_geometa)
 
 
 def file_upload_handler(event):
@@ -17,5 +17,7 @@ def load(info):
                 info['name'], file_upload_handler)
     info['apiRoot'].item.route('GET', ('geometa',),
                                geometa_search_handler)
+    info['apiRoot'].item.route('GET', (':id', 'geometa'),
+                               geometa_get_handler)
     info['apiRoot'].item.route('PUT', (':id', 'geometa'),
                                geometa_create_handler)
