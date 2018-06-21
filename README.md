@@ -32,6 +32,13 @@ cache.request.backend = "cherrypy_request"
 cd geometa
 pip install types/raster/ types/vector/ types/grid/
 ```
+
+## Vagrant Examples
+There are currently [2 vagrant examples](https://github.com/OpenGeoscience/girder_geospatial/tree/master/devops/ansible/examples) to quickly get up and running.
+If you are having problems installing this plugin check ansible playbooks for
+[ubuntu-16.04](https://github.com/OpenGeoscience/girder_geospatial/blob/master/devops/ansible/examples/ubuntu-16.04/playbook.yml) and
+[ubuntu-18.04](https://github.com/OpenGeoscience/girder_geospatial/blob/master/devops/ansible/examples/ubuntu-18.04/playbook.yml).
+
 ## Running tests
 ```sh
 cd geometa
