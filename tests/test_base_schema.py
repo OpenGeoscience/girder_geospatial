@@ -4,13 +4,16 @@ import pytest
 from marshmallow import ValidationError
 
 
+def sampleNativeBounds():
+    return {'left': 271785.000,
+            'bottom': 4345785.000,
+            'right': 506715.000,
+            'top': 4584315.000}
+
+
 def sampleBounds():
     crs = '+proj=utm +zone=10 +datum=WGS84 +units=m +no_defs '
-    nativeBounds = {'left': 271785.000,
-                    'bottom': 4345785.000,
-                    'right': 506715.000,
-                    'top': 4584315.000}
-    return from_bounds_to_geojson(nativeBounds, crs)
+    return from_bounds_to_geojson(sampleNativeBounds(), crs)
 
 
 @pytest.mark.parametrize("crs, expected", [
@@ -20,7 +23,7 @@ def sampleBounds():
 ])
 def test_crs(crs, expected):
     metadata = {'bounds': sampleBounds(),
-                'nativeBounds': {},
+                'nativeBounds': sampleNativeBounds(),
                 'type_': 'raster'}
     metadata['crs'] = crs
     schema = BaseSchema()
