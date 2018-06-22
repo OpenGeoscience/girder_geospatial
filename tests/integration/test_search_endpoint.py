@@ -1,5 +1,5 @@
 import pytest
-from .utils import uploadSampleData
+from ..utils import uploadSampleData
 
 
 @pytest.mark.plugin('geometa')

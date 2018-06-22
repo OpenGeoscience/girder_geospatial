@@ -1,7 +1,7 @@
 import json
 import pytest
 from girder.models.item import Item
-from .utils import uploadSampleData
+from ..utils import uploadSampleData
 
 
 @pytest.mark.plugin('geometa')
