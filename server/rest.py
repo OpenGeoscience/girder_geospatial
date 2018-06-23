@@ -1,6 +1,6 @@
 import pkg_resources
 from girder.api import access
-from girder.api.describe import autoDescribeRoute, Description
+from girder.api.describe import autoDescribeRoute, describeRoute, Description
 from girder.api.rest import boundHandler, filtermodel
 from girder.exceptions import ValidationException
 from girder.models.item import Item
@@ -116,6 +116,17 @@ def geometa_create_handler(self, item, geometa):
 
 @access.public
 @boundHandler
+@describeRoute(
+    Description('Query for the items that matches a given geospatial criteria')
+    .param('latitude', 'Latitude of the search point', required=False)
+    .param('longitude', 'Longitude of the search point', required=False)
+    .param('radius', 'Radius of the search circle', required=False)
+    .param('relation', 'Relation parameter for the query', required=False)
+    .param('bbox', 'Bounding box parameter', required=False)
+    .param('geometry', 'Geojson geometry for the query in wkt format',
+           required=False)
+    .param('geojson', 'Geojson geometry for the query', required=False)
+)
 def geometa_search_handler(self, params):
     schema = OpenSearchGeoSchema()
     user = self.getCurrentUser()
