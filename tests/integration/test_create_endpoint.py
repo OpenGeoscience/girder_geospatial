@@ -75,3 +75,18 @@ def test_geometa_create_with_user_data(server, admin, fsAssetstore, geometa):
     document = Item().load(uploaded['itemId'], user=admin)
 
     assert document['geometa'] == geometa
+
+
+@pytest.mark.plugin('geometa')
+@pytest.mark.parametrize('geometa', [
+    ({'foo': 'bar'})
+])
+def test_bad_geometa_fails(server, admin, fsAssetstore, geometa):
+    uploaded = uploadSampleData(server, admin, 'tests/data/*.tif')[0]
+
+    resp = server.request(path='/item/{}/geometa'.format(uploaded['itemId']),
+                          params={'geometa': json.dumps(geometa)},
+                          method='PUT',
+                          user=admin)
+
+    assert resp.status == '400 Bad Request'
