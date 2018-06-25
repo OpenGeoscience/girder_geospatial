@@ -67,8 +67,11 @@ def get_geometa(girder_item, girder_file):
     return metadata
 
 
-def create_geometa(girder_item, girder_file):
+def create_geometa(girder_item, girder_file, geometa=None):
     metadata = get_geometa(girder_item, girder_file)
+    if geometa:
+        metadata = geometa
+
     if metadata:
         schema = BaseSchema()
         schema.load(metadata)
@@ -95,13 +98,15 @@ def geometa_get_handler(self, item):
 @filtermodel(model=Item)
 @boundHandler
 @autoDescribeRoute(
-    Description('Create geospatial metadata for a given item')
+    Description('Set geospatial metadata for a given item')
     .modelParam('id', 'The ID of the item that will have geospatial metadata.',
                 model=Item, level=AccessType.READ)
+    .jsonParam('geometa', 'Json object to save as geospatial metadata',
+               required=False, default=None, requireObject=True)
 )
-def geometa_create_handler(self, item):
+def geometa_create_handler(self, item, geometa):
     girder_file = [i for i in Item().childFiles(item, limit=1)][0]
-    return create_geometa(item, girder_file)
+    return create_geometa(item, girder_file, geometa=geometa)
 
 
 @access.public

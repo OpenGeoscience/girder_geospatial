@@ -1,7 +1,7 @@
 import pyproj
 import json
 import geojson
-from marshmallow import fields, Schema, ValidationError
+from marshmallow import fields, Schema, ValidationError, validates
 from marshmallow.validate import OneOf
 
 
@@ -28,7 +28,9 @@ class Bounds(fields.Field):
 
 class BaseSchema(Schema):
     crs = Crs(required=True)
-    nativeBounds = fields.Dict(required=True)
+    nativeBounds = fields.Dict(required=True,
+                               values=fields.Float(),
+                               keys=fields.Str())
     bounds = Bounds(required=True)
     type_ = fields.Str(required=True, validate=OneOf(
         ['raster', 'vector', 'pointcloud', 'grid'],
@@ -37,3 +39,10 @@ class BaseSchema(Schema):
     altitudeEllipsoid = fields.String()
     nativeAltitude = fields.List(fields.Float)
     altitude = fields.List(fields.Float)
+
+    @validates('nativeBounds')
+    def validate_native_bounds(self, data):
+        keys = ['left', 'right', 'top', 'bottom']
+        if not all(key in data for key in keys):
+            raise ValidationError(
+                'keys "{}" must be in nativeBounds'.format(', '.join(keys)))

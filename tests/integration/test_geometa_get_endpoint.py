@@ -1,6 +1,6 @@
 import pytest
 from pytest_girder.assertions import assertStatusOk
-from .utils import uploadSampleData
+from ..utils import uploadSampleData
 
 
 @pytest.mark.plugin('geometa')
