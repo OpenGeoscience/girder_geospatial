@@ -72,3 +72,12 @@ def test_geospatial_query(server, admin, fsAssetstore, params, expected):
     uploadSampleData(server, admin, 'tests/data/*')
     resp = server.request(path='/item/geometa', user=admin, params=params)
     assert sorted([i['lowerName'] for i in resp.json]) == sorted(expected)
+
+
+@pytest.mark.plugin('geometa')
+@pytest.mark.parametrize('params', [
+    ({'latitude': 'foobar'})
+])
+def test_bad_parameters_fail(server, admin, fsAssetstore, params):
+    resp = server.request(path='/item/geometa', user=admin, params=params)
+    assert resp.status == '400 Bad Request'
