@@ -1,7 +1,8 @@
 import pkg_resources
 from girder.api import access
-from girder.api.describe import autoDescribeRoute, Description
+from girder.api.describe import autoDescribeRoute, describeRoute, Description
 from girder.api.rest import boundHandler, filtermodel
+from girder.exceptions import ValidationException
 from girder.models.item import Item
 from girder.models.assetstore import Assetstore
 from girder.constants import AccessType
@@ -9,6 +10,7 @@ from girder.utility import assetstore_utilities
 from girder.utility._cache import cache
 from geometa.schema import OpenSearchGeoSchema, BaseSchema
 from geometa import GEOSPATIAL_FIELD, CannotHandleError
+from marshmallow import ValidationError
 
 
 def _find(user, query):
@@ -106,15 +108,32 @@ def geometa_get_handler(self, item):
 )
 def geometa_create_handler(self, item, geometa):
     girder_file = [i for i in Item().childFiles(item, limit=1)][0]
-    return create_geometa(item, girder_file, geometa=geometa)
+    try:
+        return create_geometa(item, girder_file, geometa=geometa)
+    except ValidationError as e:
+        raise ValidationException(e.messages)
 
 
 @access.public
 @boundHandler
+@describeRoute(
+    Description('Query for the items that matches a given geospatial criteria')
+    .param('latitude', 'Latitude of the search point', required=False)
+    .param('longitude', 'Longitude of the search point', required=False)
+    .param('radius', 'Radius of the search circle', required=False)
+    .param('relation', 'Relation parameter for the query', required=False)
+    .param('bbox', 'Bounding box parameter', required=False)
+    .param('geometry', 'Geojson geometry for the query in wkt format',
+           required=False)
+    .param('geojson', 'Geojson geometry for the query', required=False)
+)
 def geometa_search_handler(self, params):
     schema = OpenSearchGeoSchema()
     user = self.getCurrentUser()
-    params = schema.load(params)
+    try:
+        params = schema.load(params)
+    except ValidationError as e:
+        raise ValidationException(e.messages)
     user = self.getCurrentUser()
     documents = {}
 
