@@ -3,12 +3,16 @@ from setuptools import setup
 setup(
     name='girder-plugin-geometa',
     author='Kitware, Inc.',
+    description='Generate metadata for various geospatial datasets',
     version='0.1.0',
     packages=[
         'geometa'
     ],
     entry_points={
-        'geometa.types': []
+        'geometa.types': [],
+        'girder.plugin': [
+            'geometa = geometa:GeometaPlugin'
+        ]
     },
     install_requires=[
         'pyproj',
