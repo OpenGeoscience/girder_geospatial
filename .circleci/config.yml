@@ -84,5 +84,7 @@ workflows:
       - python27-girder-3
       - python35-girder-3
       - python36-girder-3
-      - coverage
       - linting
+      - coverage
+        requires:
+          python27-girder-2
