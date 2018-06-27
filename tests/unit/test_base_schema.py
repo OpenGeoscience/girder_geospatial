@@ -1,5 +1,5 @@
 from geometa.schema import BaseSchema
-from geometa import from_bounds_to_geojson
+from geometa.utils import from_bounds_to_geojson
 import pytest
 from marshmallow import ValidationError
 
