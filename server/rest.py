@@ -93,7 +93,10 @@ def create_geometa(girder_item, girder_file, geometa=None):
 )
 def geometa_get_handler(self, item):
     girder_file = [i for i in Item().childFiles(item, limit=1)][0]
-    return get_geometa(item, girder_file)
+    try:
+        return item['geometa']
+    except KeyError:
+        return get_geometa(item, girder_file)
 
 
 @access.public
