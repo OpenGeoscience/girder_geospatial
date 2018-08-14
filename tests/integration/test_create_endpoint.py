@@ -90,3 +90,59 @@ def test_bad_geometa_fails(server, admin, fsAssetstore, geometa):
                           user=admin)
 
     assert resp.status == '400 Bad Request'
+
+
+@pytest.mark.plugin('geometa')
+@pytest.mark.parametrize('geometa', [
+    (
+        {
+            'crs': '',
+            'type_': 'raster',
+            'bounds': {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -97.73400217294692,
+                            40.17914177196121
+                        ],
+                        [
+                            -97.73371249437332,
+                            40.17914177196121
+                        ],
+                        [
+                            -97.73371249437332,
+                            40.17936924284886
+                        ],
+                        [
+                            -97.73400217294692,
+                            40.17936924284886
+                        ],
+                        [
+                            -97.73400217294692,
+                            40.17914177196121
+                        ]
+                    ]
+                ]
+            },
+            'nativeBounds': {'left': 1,
+                             'right': 1,
+                             'top': 2,
+                             'bottom': 2},
+            'foobar': 'barfoo'
+        }
+    )
+])
+def test_geometa_custom_data_is_returned(server, admin, fsAssetstore, geometa):
+    uploaded = uploadSampleData(server, admin, 'tests/data/*.tif')[0]
+
+    server.request(path='/item/{}/geometa'.format(uploaded['itemId']),
+                   params={'geometa': json.dumps(geometa)},
+                   method='PUT',
+                   user=admin)
+
+    response = server.request(
+        path='/item/{}/geometa'.format(uploaded['itemId']),
+        user=admin)
+
+    assert 'foobar' in response.json.keys()
