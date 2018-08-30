@@ -3,6 +3,7 @@ from pyproj import Proj, transform
 
 
 GEOSPATIAL_FIELD = 'geometa.bounds'
+GEOSPATIAL_SUBDATASETS_FIELD = 'geometa.subDatasets.bounds'
 
 
 class CannotHandleError(Exception):
