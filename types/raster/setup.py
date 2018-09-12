@@ -14,6 +14,7 @@ setup(
     install_requires=[
         # Eventually will require geometa girder plugin
         # as a dependency here
-        'gdal'
+        'gdal',
+        'rasterio'
     ]
 )

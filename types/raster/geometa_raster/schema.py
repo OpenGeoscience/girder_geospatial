@@ -1,9 +1,10 @@
-import math
 from marshmallow import fields, ValidationError
 from geometa.schema import BaseSchema
 from geometa import from_bounds_to_geojson, CannotHandleError
 import gdal
 import osr
+import rasterio
+from rasterio.errors import RasterioIOError
 
 
 class RasterSchema(BaseSchema):
@@ -39,21 +40,14 @@ def get_band_info(dataset):
     return bands
 
 
-def get_bounds(dataset):
-    left, xres, xskew, top, yskew, yres = dataset.GetGeoTransform()
-    if xres == 0 or yres == 0:
-        xres = math.sqrt(xres * xres + yskew * yskew)
-        yres = math.sqrt(xskew * xskew + yres * yres)
+def get_bounds(rasterio_dataset):
 
-    right = left + (dataset.RasterXSize * xres)
-    bottom = top + (dataset.RasterYSize * yres)
+    bounds = rasterio_dataset.bounds
 
-    bounds = {'left': left,
-              'bottom': bottom,
-              'right': right,
-              'top': top}
-
-    return bounds
+    return {'left': bounds.left,
+            'bottom': bounds.bottom,
+            'right': bounds.right,
+            'top': bounds.top}
 
 
 def handler(path):
@@ -63,11 +57,17 @@ def handler(path):
         metadata['type_'] = 'raster'
 
         dataset = gdal.Open(path)
+
         if dataset.GetSubDatasets():
             raise CannotHandleError('Cannot handle this data type')
 
+        try:
+            with rasterio.open(path) as src:
+                bounds = get_bounds(src)
+        except RasterioIOError:
+            raise CannotHandleError('Cannot handle this data type')
+
         crs = get_projection_as_proj4(dataset)
-        bounds = get_bounds(dataset)
 
         metadata['crs'] = crs
         metadata['bands'] = dataset.RasterCount
