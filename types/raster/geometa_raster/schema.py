@@ -1,3 +1,4 @@
+import math
 from marshmallow import fields, ValidationError
 from geometa.schema import BaseSchema
 from geometa import from_bounds_to_geojson, CannotHandleError
@@ -40,6 +41,10 @@ def get_band_info(dataset):
 
 def get_bounds(dataset):
     left, xres, xskew, top, yskew, yres = dataset.GetGeoTransform()
+    if xres == 0 or yres == 0:
+        xres = math.sqrt(xres * xres + yskew * yskew)
+        yres = math.sqrt(xskew * xskew + yres * yres)
+
     right = left + (dataset.RasterXSize * xres)
     bottom = top + (dataset.RasterYSize * yres)
 
