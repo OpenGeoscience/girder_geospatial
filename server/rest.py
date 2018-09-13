@@ -1,4 +1,5 @@
 import pkg_resources
+import inspect
 from girder.api import access
 from girder.api.describe import autoDescribeRoute, describeRoute, Description
 from girder.api.rest import boundHandler, filtermodel
@@ -66,15 +67,21 @@ def _get_girder_path(girder_file):
 @cache.cache_on_arguments()
 def get_type_handlers():
     entry_points = pkg_resources.iter_entry_points('geometa.types')
-    return {e.name: e.load() for e in entry_points}
+    return {e.name: [e.load(), inspect.getargspec(e.load()).args]
+            for e in entry_points}
 
 
 def get_geometa(girder_item, girder_file):
     path = _get_girder_path(girder_file)
     metadata = {}
-    for entry_point_name, entry_point in get_type_handlers().items():
+    for entry_point_name, [handler, args] in get_type_handlers().items():
+        kwargs = {}
+        if 'girder_item' in args:
+            kwargs['girder_item'] = girder_item
+        if 'girder_file' in args:
+            kwargs['girder_file'] = girder_file
         try:
-            metadata = entry_point(path)
+            metadata = handler(path, **kwargs)
         except CannotHandleError:
             pass
 
