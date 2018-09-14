@@ -39,6 +39,17 @@ def get_bounds(dataset):
     return bounds
 
 
+def get_bounds_from_gcp(dataset):
+    upper_left = [i for i in dataset.GetGCPs() if i.Id == 'UpperLeft'][0]
+    lower_right = [i for i in dataset.GetGCPs() if i.Id == 'LowerRight'][0]
+    bounds = {'left': upper_left.GCPX,
+              'bottom': lower_right.GCPY,
+              'right': lower_right.GCPX,
+              'top': upper_left.GCPY}
+
+    return bounds
+
+
 def get_projection_as_proj4(dataset):
     projection = osr.SpatialReference()
     projection.ImportFromWkt(dataset.GetProjection())
@@ -50,7 +61,10 @@ def get_subdataset_info(subDataset):
     wgs84 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
     crs = get_projection_as_proj4(dataset) or wgs84
     metadata = {}
-    bounds = get_bounds(dataset)
+    if dataset.GetGCPCount() > 0:
+        bounds = get_bounds_from_gcp(dataset)
+    else:
+        bounds = get_bounds(dataset)
     metadata['crs'] = crs
     metadata['type_'] = 'grid'
     metadata['name'] = dataset.GetDescription()
