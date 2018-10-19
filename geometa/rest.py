@@ -44,6 +44,7 @@ def get_documents_by_geometry(user, geometry, relation):
     }
     return _find(user, query)
 
+
 def get_documents_by_radius(user, latitude, longitude, radius):
     RADIUS_OF_EARTH = 6378137.0  # average in meters
     query = {

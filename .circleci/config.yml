@@ -18,46 +18,25 @@ ci-steps: &ci-steps
 
 version: 2
 jobs:
-  python27-girder-2:
+  python27:
     docker:
       - image: dozturk2/girder_geospatial
     environment:
-     - TEST_TOX_ENV: "py27-girder-2"
+     - TEST_TOX_ENV: "py27"
     <<: *ci-steps
 
-  python35-girder-2:
+  python35:
     docker:
       - image: dozturk2/girder_geospatial
     environment:
-     - TEST_TOX_ENV: "py35-girder-2"
+     - TEST_TOX_ENV: "py35"
     <<: *ci-steps
 
-  python36-girder-2:
+  python36:
     docker:
       - image: dozturk2/girder_geospatial
     environment:
-     - TEST_TOX_ENV: "py36-girder-2"
-    <<: *ci-steps
-
-  python27-girder-3:
-    docker:
-      - image: dozturk2/girder_geospatial
-    environment:
-     - TEST_TOX_ENV: "py27-girder-3"
-    <<: *ci-steps
-
-  python35-girder-3:
-    docker:
-      - image: dozturk2/girder_geospatial
-    environment:
-     - TEST_TOX_ENV: "py35-girder-3"
-    <<: *ci-steps
-
-  python36-girder-3:
-    docker:
-      - image: dozturk2/girder_geospatial
-    environment:
-     - TEST_TOX_ENV: "py36-girder-3"
+     - TEST_TOX_ENV: "py36"
     <<: *ci-steps
 
   linting:
@@ -71,10 +50,7 @@ workflows:
   version: 2
   test:
     jobs:
-      - python27-girder-2
-      - python35-girder-2
-      - python36-girder-2
-      - python27-girder-3
-      - python35-girder-3
-      - python36-girder-3
+      - python27
+      - python35
+      - python36
       - linting
