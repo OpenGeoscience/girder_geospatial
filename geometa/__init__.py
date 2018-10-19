@@ -12,6 +12,7 @@ def file_upload_handler(event):
     girder_item = Item().load(event.info['file']['itemId'], force=True)
     create_geometa(girder_item, girder_file)
 
+
 class GeometaPlugin(GirderPlugin):
     DISPLAY_NAME = 'Geometa Plugin'
 

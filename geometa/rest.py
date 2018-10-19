@@ -10,7 +10,7 @@ from girder.constants import AccessType
 from girder.utility import assetstore_utilities
 from girder.utility._cache import cache
 from geometa.schema import OpenSearchGeoSchema, BaseSchema
-from .constants import GEOSPATIAL_FIELD
+from .constants import GEOSPATIAL_FIELD, GEOSPATIAL_SUBDATASETS_FIELD
 from .exceptions import CannotHandleError
 from marshmallow import ValidationError
 
@@ -43,7 +43,6 @@ def get_documents_by_geometry(user, geometry, relation):
 
     }
     return _find(user, query)
-
 
 def get_documents_by_radius(user, latitude, longitude, radius):
     RADIUS_OF_EARTH = 6378137.0  # average in meters
