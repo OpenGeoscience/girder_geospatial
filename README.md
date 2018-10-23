@@ -17,7 +17,7 @@ git clone https://github.com/OpenGeoscience/girder_geospatial.git geometa
 ```
 5. Install the geometa plugin.
 ```sh
-girder-install plugin geometa -s
+cd geometa && pip install -e .
 ```
 6. Enable Girder cache by adding following to your [girder config file](https://girder.readthedocs.io/en/latest/configuration.html):
 ```sh
