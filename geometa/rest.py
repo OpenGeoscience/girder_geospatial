@@ -10,8 +10,8 @@ from girder.constants import AccessType
 from girder.utility import assetstore_utilities
 from girder.utility._cache import cache
 from geometa.schema import OpenSearchGeoSchema, BaseSchema
-from geometa import GEOSPATIAL_FIELD, \
-    GEOSPATIAL_SUBDATASETS_FIELD, CannotHandleError
+from .constants import GEOSPATIAL_FIELD, GEOSPATIAL_SUBDATASETS_FIELD
+from .exceptions import CannotHandleError
 from marshmallow import ValidationError
 
 

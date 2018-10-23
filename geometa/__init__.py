@@ -1,33 +1,27 @@
-from shapely.geometry import Polygon, mapping
-from pyproj import Proj, transform
+from girder import events
+from girder.models.file import File
+from girder.models.item import Item
+from girder.plugin import GirderPlugin
+from .rest import (geometa_search_handler, geometa_create_handler,
+                   geometa_get_handler, create_geometa)
 
 
-GEOSPATIAL_FIELD = 'geometa.bounds'
-GEOSPATIAL_SUBDATASETS_FIELD = 'geometa.subDatasets.bounds'
+def file_upload_handler(event):
+    _id = event.info['file']['_id']
+    girder_file = File().load(_id, force=True)
+    girder_item = Item().load(event.info['file']['itemId'], force=True)
+    create_geometa(girder_item, girder_file)
 
 
-class CannotHandleError(Exception):
-    pass
+class GeometaPlugin(GirderPlugin):
+    DISPLAY_NAME = 'Geometa Plugin'
 
-
-def clamp(number, lowerBound, upperBound):
-    return max(lowerBound, min(number, upperBound))
-
-
-def from_bounds_to_geojson(bounds, crs):
-    try:
-        in_proj = Proj(crs)
-        out_proj = Proj(init='epsg:4326')
-        xmin, ymin = transform(in_proj, out_proj,
-                               bounds['left'], bounds['bottom'])
-        xmax, ymax = transform(in_proj, out_proj,
-                               bounds['right'], bounds['top'])
-        # Index creation fails for layers that
-        # exceeds lat long limits in mongo
-        wgs84_bounds = Polygon.from_bounds(clamp(xmin, -180.0, 180.0),
-                                           clamp(ymin, -90.0, 90.0),
-                                           clamp(xmax, -180.0, 180.0),
-                                           clamp(ymax, -90.0, 90.0))
-        return mapping(wgs84_bounds)
-    except RuntimeError:
-        return ''
+    def load(self, info):
+        events.bind('model.file.finalizeUpload.after',
+                    'name', file_upload_handler)
+        info['apiRoot'].item.route('GET', ('geometa',),
+                                   geometa_search_handler)
+        info['apiRoot'].item.route('GET', (':id', 'geometa'),
+                                   geometa_get_handler)
+        info['apiRoot'].item.route('PUT', (':id', 'geometa'),
+                                   geometa_create_handler)

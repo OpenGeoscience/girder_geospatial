@@ -39,13 +39,6 @@ jobs:
      - TEST_TOX_ENV: "py36"
     <<: *ci-steps
 
-  coverage:
-    docker:
-      - image: dozturk2/girder_geospatial
-    environment:
-     - TEST_TOX_ENV: "coverage"
-    <<: *ci-steps
-
   linting:
     docker:
       - image: dozturk2/girder_geospatial
@@ -60,5 +53,4 @@ workflows:
       - python27
       - python35
       - python36
-      - coverage
       - linting
