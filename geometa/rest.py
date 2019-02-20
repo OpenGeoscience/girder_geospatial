@@ -88,10 +88,9 @@ def get_geometa(girder_item, girder_file):
     return metadata
 
 
-def create_geometa(girder_item, girder_file, geometa=None):
-    metadata = get_geometa(girder_item, girder_file)
-    if geometa:
-        metadata = geometa
+def create_geometa(girder_item, girder_file, metadata=None):
+    if not metadata:
+        metadata = get_geometa(girder_item, girder_file)
 
     if metadata:
         schema = BaseSchema()
@@ -129,9 +128,11 @@ def geometa_get_handler(self, item):
                required=False, default=None, requireObject=True)
 )
 def geometa_create_handler(self, item, geometa):
-    girder_file = [i for i in Item().childFiles(item, limit=1)][0]
+    girder_file = None
+    if not geometa:
+        girder_file = [i for i in Item().childFiles(item, limit=1)][0]
     try:
-        return create_geometa(item, girder_file, geometa=geometa)
+        return create_geometa(item, girder_file, geometa)
     except ValidationError as e:
         raise ValidationException(e.messages)
 
