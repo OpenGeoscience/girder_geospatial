@@ -3,6 +3,7 @@ initialize-venv: &initialize-venv
   command: |
     python -m virtualenv ../venv || python -m venv ../venv
     . ../venv/bin/activate
+    pip install tox
 
 ci-steps: &ci-steps
   steps:
@@ -11,8 +12,15 @@ ci-steps: &ci-steps
     - run:
         <<: *initialize-venv
     - run:
+        name: Install mongodb
+        command: |
+          apt-get update && apt-get install mongodb -y
+          mkdir -p /data/db
+
+    - run:
         name: Run the tests
         command: |
+          . ../venv/bin/activate
           mongod > /dev/null 2>&1 &
           tox -e $TEST_TOX_ENV -c ~/geometa
 
@@ -20,21 +28,21 @@ version: 2
 jobs:
   python27:
     docker:
-      - image: dozturk2/girder_geospatial
+      - image: python:2.7
     environment:
      - TEST_TOX_ENV: "py27"
     <<: *ci-steps
 
   python35:
     docker:
-      - image: dozturk2/girder_geospatial
+      - image: python:3.5
     environment:
      - TEST_TOX_ENV: "py35"
     <<: *ci-steps
 
   python36:
     docker:
-      - image: dozturk2/girder_geospatial
+      - image: python:3.6
     environment:
      - TEST_TOX_ENV: "py36"
     <<: *ci-steps

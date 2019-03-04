@@ -30,11 +30,6 @@ def test_empty_params(server, admin):
         ['stations.geojson']
     ),
     (
-        {'longitude': -82.353515625, 'latitude': 34.415973384481866,
-         'radius': 1000000},
-        ['stations.geojson']
-    ),
-    (
         {
             "geojson": {
                 "type": "Polygon",
