@@ -61,7 +61,11 @@ def get_documents_by_radius(user, latitude, longitude, radius):
 def _get_girder_path(girder_file):
     assetstore = Assetstore().load(girder_file['assetstoreId'])
     adapter = assetstore_utilities.getAssetstoreAdapter(assetstore)
-    return adapter.fullPath(girder_file)
+    try:
+        path = adapter.fullPath(girder_file)
+    except AttributeError:
+        path = ''
+    return path
 
 
 @cache.cache_on_arguments()
