@@ -10,10 +10,5 @@ setup(
     },
     packages=[
         'geometa_vector'
-    ],
-    install_requires=[
-        # Eventually will require geometa girder plugin
-        # as a dependency here
-        'gdal'
     ]
 )

@@ -11,10 +11,5 @@ setup(
     },
     packages=[
         'geometa_grid'
-    ],
-    install_requires=[
-        # Eventually will require geometa girder plugin
-        # as a dependency here
-        'gdal'
     ]
 )
