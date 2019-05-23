@@ -1,10 +1,10 @@
 from setuptools import setup
 
 setup(
-    name='girder-plugin-geometa',
+    name='girder-geospatial',
     author='Kitware, Inc.',
     description='Generate metadata for various geospatial datasets',
-    version='0.1.0',
+    version='0.1.0a2',
     packages=[
         'geometa'
     ],
@@ -19,6 +19,8 @@ setup(
         'shapely',
         # Will fix it once marshmallow publishes new version
         'marshmallow==3.0.0b10',
-        'geojson'
-    ]
+        'geojson',
+        'rasterio',
+        'gdal'
+    ],
 )
