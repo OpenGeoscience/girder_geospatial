@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='girder-plugin-geometa-vector',
+    name='girder-geospatial-vector',
     author='Kitware, Inc.',
     entry_points={
         'geometa.types': [

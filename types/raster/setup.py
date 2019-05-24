@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='girder-plugin-geometa-raster',
+    name='girder-geospatial-raster',
     author='Kitware, Inc.',
     entry_points={
         'geometa.types': [

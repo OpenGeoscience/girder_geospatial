@@ -1,13 +1,18 @@
-from setuptools import setup
+from setuptools import setup, find_packages
+
+with open('README.md') as readme:
+    long_description = readme.read()
 
 setup(
     name='girder-geospatial',
-    author='Kitware, Inc.',
+    version='0.1.0a5',
     description='Generate metadata for various geospatial datasets',
-    version='0.1.0a2',
-    packages=[
-        'geometa'
-    ],
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    url='https://github.com/OpenGeoscience/girder_geospatial',
+    maintainer='Kitware, Inc.',
+    maintainer_email='kitware@kitware.com',
+    packages=find_packages(exclude=('tests')),      # Should we add types to this?
     entry_points={
         'geometa.types': [],
         'girder.plugin': [
@@ -21,6 +26,7 @@ setup(
         'marshmallow==3.0.0b10',
         'geojson',
         'rasterio',
-        'gdal'
+        # 'gdal==2.2.3'     Will work with gdal2+, but it needs to be
+        #                   installed beforehand to match the gdal installation
     ],
 )

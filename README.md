@@ -4,10 +4,12 @@
 
 ## Installation
 1. [Install girder](https://girder.readthedocs.io/en/latest/installation.html).
-2. Install [gdal](http://www.gdal.org/) version 2 or higher on to your system.
+2. Install [gdal](http://gdal.org/) version 2 or higher on to your system. If not installing with a wheel:
+* Install gdal to your system with the instructions above
+* Pip install the corresponding version of gdal
+
 3. Test your gdal installation by running
 ```sh
-pip install gdal
 python -c "import gdal"
 ```
 
