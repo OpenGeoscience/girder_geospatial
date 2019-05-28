@@ -4,34 +4,37 @@
 
 ## Installation
 1. [Install girder](https://girder.readthedocs.io/en/latest/installation.html).
-2. Install [gdal](http://gdal.org/) version 2 or higher on to your system. If not installing with a wheel:
-* Install gdal to your system with the instructions above
-* Pip install the corresponding version of gdal
+2. Install [gdal](http://gdal.org/) version 2 or higher on to your system.
+
+    * To install with a wheel, run:
+
+            pip install gdal -f https://manthey.github.io/large_image_wheels/
+
+
+    * If not installing with a wheel:
+        * Install gdal to your system with the instructions above
+        * Check system gdal version by running `gdal-config --version`
+        * Pip install the corresponding version of gdal
 
 3. Test your gdal installation by running
 ```sh
 python -c "import gdal"
 ```
 
-4. Clone the girder_geospatial repository as "geometa".  (Girder requires the directory name to match the plugin name.  This requirement will no longer be necessary for future versions of Girder.)
+4. Install the geospatial plugin and desired types packages.
 ```sh
-git clone https://github.com/OpenGeoscience/girder_geospatial.git geometa
+pip install girder-geospatial
+pip install girder-geospatial-raster \
+            girder-geospatial-vector \
+            girder-geospatial-grid
 ```
-5. Install the geometa plugin.
-```sh
-cd geometa && pip install -e .
-```
-6. Enable Girder cache by adding following to your [girder config file](https://girder.readthedocs.io/en/latest/configuration.html):
+
+5. Enable Girder cache by adding following to your [girder config file](https://girder.readthedocs.io/en/latest/configuration.html):
 ```sh
 [cache]
 enabled = True
 cache.global.backend = "dogpile.cache.memory"
 cache.request.backend = "cherrypy_request"
-```
-8. Install geospatial types
-```sh
-cd geometa
-pip install types/raster/ types/vector/ types/grid/
 ```
 
 ## Usage
