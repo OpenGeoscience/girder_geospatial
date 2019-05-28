@@ -4,7 +4,8 @@ from setuptools import setup
 setup(
     name='girder-geospatial-grid',
     version='0.1.0',
-    description='Support for grid data types in the girder-geospatial package',
+    description='Support for grid data types'
+                'in the girder-geospatial package',
     url='https://github.com/OpenGeoscience/girder_geospatial',
     maintainer='Kitware, Inc.',
     maintainer_email='kitware@kitware.com',
