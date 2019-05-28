@@ -12,7 +12,7 @@ setup(
     url='https://github.com/OpenGeoscience/girder_geospatial',
     maintainer='Kitware, Inc.',
     maintainer_email='kitware@kitware.com',
-    packages=find_packages(exclude=('tests')),      # Should we add types to this?
+    packages=find_packages(exclude=('tests')),
     entry_points={
         'geometa.types': [],
         'girder.plugin': [
@@ -26,7 +26,6 @@ setup(
         'marshmallow==3.0.0b10',
         'geojson',
         'rasterio',
-        # 'gdal==2.2.3'     Will work with gdal2+, but it needs to be
-        #                   installed beforehand to match the gdal installation
+        'gdal'
     ],
 )
