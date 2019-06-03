@@ -5,7 +5,7 @@ with open('README.md') as readme:
 
 setup(
     name='girder-geospatial',
-    version='0.1.0',
+    version='0.2.0',
     description='Generate metadata for various geospatial datasets',
     long_description=long_description,
     long_description_content_type='text/markdown',
