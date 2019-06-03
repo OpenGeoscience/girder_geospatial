@@ -13,6 +13,7 @@ def file_upload_handler(event):
     create_geometa(girder_item, girder_file)
     events.trigger('geometa.created', info=event.info)
 
+
 class GeometaPlugin(GirderPlugin):
     DISPLAY_NAME = 'Geometa Plugin'
 
