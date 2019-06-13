@@ -1,5 +1,4 @@
 from girder import events
-from girder.models.file import File
 from girder.models.item import Item
 from girder.plugin import GirderPlugin
 from .rest import (geometa_search_handler, geometa_create_handler,
@@ -7,10 +6,10 @@ from .rest import (geometa_search_handler, geometa_create_handler,
 
 
 def file_upload_handler(event):
-    _id = event.info['file']['_id']
-    girder_file = File().load(_id, force=True)
-    girder_item = Item().load(event.info['file']['itemId'], force=True)
-    create_geometa(girder_item, girder_file)
+    file = event.info['file']
+    if file.get('itemId'):
+        girder_item = Item().load(file['itemId'], force=True)
+        create_geometa(girder_item, file)
 
 
 class GeometaPlugin(GirderPlugin):
