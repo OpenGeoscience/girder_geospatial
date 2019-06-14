@@ -1,0 +1,14 @@
+include LICENSE
+include setup.py
+include README.md
+graft geometa
+prune tests
+prune devops
+prune types
+prune .circleci
+prune .tox
+exclude Dockerfile
+exclude tox.ini
+exclude requirements-dev.txt
+exclude .*
+global-exclude *.pyc __pycache__
