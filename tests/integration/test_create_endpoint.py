@@ -2,8 +2,8 @@ import json
 import pytest
 from girder.models.item import Item
 from pytest_girder.assertions import assertStatusOk
+from geometa.constants import GEOMETA_FIELD
 from ..utils import uploadSampleData
-
 
 @pytest.mark.plugin('geometa')
 def test_geometa_create_endpoint(server, admin, fsAssetstore):
@@ -12,7 +12,7 @@ def test_geometa_create_endpoint(server, admin, fsAssetstore):
 
     # Remove geometa from item and recreate it using the endpoint
     # as opposed to relying on upload event
-    del document['geometa']
+    del document[GEOMETA_FIELD]
     Item().updateItem(document)
     resp = server.request(path='/item/{}/geometa'.format(uploaded['itemId']),
                           method='PUT',
@@ -21,7 +21,7 @@ def test_geometa_create_endpoint(server, admin, fsAssetstore):
     assertStatusOk(resp)
 
     document = Item().load(uploaded['itemId'], user=admin)
-    assert 'geometa' in document
+    assert GEOMETA_FIELD in document
 
 
 @pytest.mark.plugin('geometa')
@@ -74,7 +74,7 @@ def test_geometa_create_with_user_data(server, admin, fsAssetstore, geometa):
 
     document = Item().load(uploaded['itemId'], user=admin)
 
-    assert document['geometa'] == geometa
+    assert document[GEOMETA_FIELD] == geometa
 
 
 @pytest.mark.plugin('geometa')

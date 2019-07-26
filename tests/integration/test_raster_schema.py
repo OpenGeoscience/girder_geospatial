@@ -1,6 +1,7 @@
 import json
 import pytest
 from girder.models.item import Item
+from geometa.constants import GEOMETA_FIELD
 from ..utils import uploadSampleData
 
 
@@ -17,4 +18,4 @@ def test_raster_geometa(server, admin, fsAssetstore, testFile, expected):
     with open(expected) as f:
         expectedJson = json.load(f)
 
-    assert list(document['geometa']).sort() == list(expectedJson).sort()
+    assert list(document[GEOMETA_FIELD]).sort() == list(expectedJson).sort()

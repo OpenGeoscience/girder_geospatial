@@ -1,2 +1,4 @@
-GEOSPATIAL_FIELD = 'geometa.bounds'
-GEOSPATIAL_SUBDATASETS_FIELD = 'geometa.subDatasets.bounds'
+GEOMETA_FIELD = 'geometa'
+GEOMETA_CREATION_EVENT = '%s.created' % GEOMETA_FIELD
+GEOSPATIAL_FIELD = '%s.bounds' % GEOMETA_FIELD
+GEOSPATIAL_SUBDATASETS_FIELD = '%s.subDatasets.bounds' % GEOMETA_FIELD

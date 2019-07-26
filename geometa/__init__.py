@@ -1,6 +1,7 @@
 from girder import events
 from girder.models.item import Item
 from girder.plugin import GirderPlugin
+from .constants import GEOMETA_CREATION_EVENT
 from .rest import (geometa_search_handler, geometa_create_handler,
                    geometa_get_handler, create_geometa)
 
@@ -11,7 +12,7 @@ def file_upload_handler(event):
         girder_item = Item().load(file['itemId'], force=True)
 
         if create_geometa(girder_item, file):
-            events.trigger('geometa.created', info=event.info)
+            events.trigger(GEOMETA_CREATION_EVENT, info=event.info)
 
 
 class GeometaPlugin(GirderPlugin):
