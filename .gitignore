@@ -7,3 +7,4 @@
 .vagrant
 *.retry
 *roles*
+.vscode

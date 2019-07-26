@@ -5,6 +5,7 @@ from pytest_girder.assertions import assertStatusOk
 from geometa.constants import GEOMETA_FIELD
 from ..utils import uploadSampleData
 
+
 @pytest.mark.plugin('geometa')
 def test_geometa_create_endpoint(server, admin, fsAssetstore):
     uploaded = uploadSampleData(server, admin, 'tests/data/*.tif')[0]
