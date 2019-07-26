@@ -110,8 +110,9 @@ def create_geometa(girder_item, girder_file, metadata=None):
         girder_item['geometa'] = metadata
         Item().save(girder_item)
         Item().collection.create_index([(GEOSPATIAL_FIELD, "2dsphere")])
-
-    return girder_item
+        return girder_item
+    else:
+        return None
 
 
 @access.public
