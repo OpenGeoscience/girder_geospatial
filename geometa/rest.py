@@ -1,3 +1,4 @@
+from tempfile import NamedTemporaryFile
 import pkg_resources
 import inspect
 from girder.api import access
@@ -5,6 +6,7 @@ from girder.api.describe import autoDescribeRoute, describeRoute, Description
 from girder.api.rest import boundHandler, filtermodel
 from girder.exceptions import ValidationException
 from girder.models.item import Item
+from girder.models.file import File
 from girder.models.assetstore import Assetstore
 from girder.constants import AccessType
 from girder.utility import assetstore_utilities
@@ -58,10 +60,28 @@ def get_documents_by_radius(user, latitude, longitude, radius):
     return _find(user, query)
 
 
-def _get_girder_path(girder_file):
+def _get_path_from_filesystem(girder_file):
     assetstore = Assetstore().load(girder_file['assetstoreId'])
     adapter = assetstore_utilities.getAssetstoreAdapter(assetstore)
     return adapter.fullPath(girder_file)
+
+
+def _get_path_after_download(girder_file):
+    with NamedTemporaryFile(delete=False) as f:
+        path = f.name
+        for data in File().download(girder_file, headers=False)():
+            f.write(data)
+
+    return path
+
+
+def _get_girder_path(girder_file):
+    try:
+        path = _get_path_from_filesystem(girder_file)
+    except AttributeError:
+        path = _get_path_after_download(girder_file)
+
+    return path
 
 
 @cache.cache_on_arguments()
