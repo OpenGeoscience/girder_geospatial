@@ -14,7 +14,9 @@ ci-steps: &ci-steps
     - run:
         name: Install mongodb
         command: |
-          apt-get update && apt-get install mongodb -y
+          apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+          echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | tee /etc/apt/sources.list.d/mongodb.list
+          apt update && apt install mongodb-org -y
           mkdir -p /data/db
 
     - run:
@@ -47,6 +49,13 @@ jobs:
      - TEST_TOX_ENV: "py36"
     <<: *ci-steps
 
+  python37:
+    docker:
+      - image: python:3.7
+    environment:
+     - TEST_TOX_ENV: "py37"
+    <<: *ci-steps
+
   linting:
     docker:
       - image: dozturk2/girder_geospatial
@@ -61,4 +70,5 @@ workflows:
       - python27
       - python35
       - python36
+      - python37
       - linting
