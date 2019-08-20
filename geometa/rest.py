@@ -58,33 +58,7 @@ def get_documents_by_radius(user, latitude, longitude, radius):
     return _find(user, query)
 
 
-def _get_path_after_download(girder_file):
-    with NamedTemporaryFile(delete=False) as f:
-        path = f.name
-        for data in File().download(girder_file, headers=False)():
-            f.write(data)
-
-    return path
-
-
-def _get_girder_path(girder_file):
-    try:
-        path = File().getLocalFilePath(girder_file)
-    except FilePathException:
-        path = _get_path_after_download(girder_file)
-
-    return path
-
-
-@cache.cache_on_arguments()
-def get_type_handlers():
-    entry_points = pkg_resources.iter_entry_points('geometa.types')
-    return {e.name: [e.load(), inspect.getargspec(e.load()).args]
-            for e in entry_points}
-
-
-def get_geometa(girder_item, girder_file):
-    path = _get_girder_path(girder_file)
+def _get_geometa(girder_item, girder_file, path):
     metadata = {}
     for entry_point_name, [handler, args] in get_type_handlers().items():
         kwargs = {}
@@ -98,6 +72,32 @@ def get_geometa(girder_item, girder_file):
             pass
 
     return metadata
+
+
+def _get_geometa_from_filesystem(girder_item, girder_file):
+    path = File().getLocalFilePath(girder_file)
+    return _get_geometa(girder_item, girder_file, path)
+
+
+def _get_geometa_from_remote_assetstore(girder_item, girder_file):
+    with NamedTemporaryFile() as f:
+        for data in File().download(girder_file, headers=False)():
+            f.write(data)
+        return _get_geometa(girder_item, girder_file, f.name)
+
+
+@cache.cache_on_arguments()
+def get_type_handlers():
+    entry_points = pkg_resources.iter_entry_points('geometa.types')
+    return {e.name: [e.load(), inspect.getargspec(e.load()).args]
+            for e in entry_points}
+
+
+def get_geometa(girder_item, girder_file):
+    try:
+        return _get_geometa_from_filesystem(girder_item, girder_file)
+    except FilePathException:
+        return _get_geometa_from_remote_assetstore(girder_item, girder_file)
 
 
 def create_geometa(girder_item, girder_file, metadata=None):
