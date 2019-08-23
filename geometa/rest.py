@@ -10,7 +10,11 @@ from girder.models.file import File
 from girder.constants import AccessType
 from girder.utility._cache import cache
 from geometa.schema import OpenSearchGeoSchema, BaseSchema
-from .constants import GEOSPATIAL_FIELD, GEOSPATIAL_SUBDATASETS_FIELD
+from .constants import (
+    GEOSPATIAL_FIELD,
+    GEOSPATIAL_SUBDATASETS_FIELD,
+    GEOMETA_FIELD
+)
 from .exceptions import CannotHandleError
 from marshmallow import ValidationError
 
@@ -107,11 +111,12 @@ def create_geometa(girder_item, girder_file, metadata=None):
     if metadata:
         schema = BaseSchema()
         schema.load(metadata)
-        girder_item['geometa'] = metadata
+        girder_item[GEOMETA_FIELD] = metadata
         Item().save(girder_item)
         Item().collection.create_index([(GEOSPATIAL_FIELD, "2dsphere")])
-
-    return girder_item
+        return girder_item
+    else:
+        return None
 
 
 @access.public
@@ -124,7 +129,7 @@ def create_geometa(girder_item, girder_file, metadata=None):
 def geometa_get_handler(self, item):
     girder_file = [i for i in Item().childFiles(item, limit=1)][0]
     try:
-        return item['geometa']
+        return item[GEOMETA_FIELD]
     except KeyError:
         return get_geometa(item, girder_file)
 

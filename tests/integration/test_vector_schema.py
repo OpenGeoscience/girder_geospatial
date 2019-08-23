@@ -1,6 +1,7 @@
 import json
 import pytest
 from girder.models.item import Item
+from geometa.constants import GEOMETA_FIELD
 from ..utils import uploadSampleData
 
 
@@ -15,7 +16,7 @@ def test_vector_geometa(server, admin, fsAssetstore, testFile, expected):
     with open(expected) as f:
         expectedJson = json.load(f)
 
-    assert list(document['geometa']).sort() == list(expectedJson).sort()
+    assert list(document[GEOMETA_FIELD]).sort() == list(expectedJson).sort()
 
 
 @pytest.mark.plugin('geometa')
@@ -24,6 +25,6 @@ def test_union_layer_bounds(server, admin, fsAssetstore):
     uploaded = uploadSampleData(server, admin, testFile)[0]
     document = Item().load(uploaded['itemId'], user=admin)
 
-    if document['geometa']['layers'] == 1:
-        expected = document['geometa']['layerInfo'][0]['bounds']
-        assert document['geometa']['bounds'] == expected
+    if document[GEOMETA_FIELD]['layers'] == 1:
+        expected = document[GEOMETA_FIELD]['layerInfo'][0]['bounds']
+        assert document[GEOMETA_FIELD]['bounds'] == expected
