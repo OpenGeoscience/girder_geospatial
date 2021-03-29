@@ -8,8 +8,11 @@ from .rest import (geometa_search_handler, geometa_create_handler,
 
 def file_upload_handler(event):
     file = event.info
-    item = Item().load(file['itemId'], force=True)
+    item_id = file.get('itemId')
+    if item_id is None:
+        return
 
+    item = Item().load(item_id, force=True)
     if item and item.get('geometa') is None:
         if create_geometa(item, file):
             events.trigger(GEOMETA_CREATION_EVENT, info=event.info)
