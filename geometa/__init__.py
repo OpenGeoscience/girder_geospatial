@@ -7,11 +7,11 @@ from .rest import (geometa_search_handler, geometa_create_handler,
 
 
 def file_upload_handler(event):
-    file = event.info['file']
-    if file.get('itemId'):
-        girder_item = Item().load(file['itemId'], force=True)
+    file = event.info
+    item = Item().load(file['itemId'], force=True)
 
-        if create_geometa(girder_item, file):
+    if item and item.get('geometa') is None:
+        if create_geometa(item, file):
             events.trigger(GEOMETA_CREATION_EVENT, info=event.info)
 
 
@@ -19,8 +19,9 @@ class GeometaPlugin(GirderPlugin):
     DISPLAY_NAME = 'Geometa Plugin'
 
     def load(self, info):
-        events.bind('model.file.finalizeUpload.after',
-                    'name', file_upload_handler)
+        events.bind('model.file.save.after',
+                    'file_upload_handler', file_upload_handler)
+
         info['apiRoot'].item.route('GET', ('geometa',),
                                    geometa_search_handler)
         info['apiRoot'].item.route('GET', (':id', 'geometa'),
