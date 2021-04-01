@@ -2,8 +2,7 @@ from marshmallow import fields
 from geometa.schema import BaseSchema
 from geometa.utils import from_bounds_to_geojson
 from geometa.exceptions import CannotHandleError
-import gdal
-import osr
+from osgeo import gdal, osr
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 

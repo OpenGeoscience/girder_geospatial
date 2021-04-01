@@ -18,7 +18,7 @@
 
 3. Test your gdal installation by running
 ```sh
-python -c "import gdal"
+python -c "from osgeo import gdal"
 ```
 
 4. Install the geospatial plugin and desired types packages.
