@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='girder-geospatial-raster',
-    version='0.1.0',
+    version='0.1.1',
     description='Support for raster data types'
                 'in the girder-geospatial package',
     url='https://github.com/OpenGeoscience/girder_geospatial',
