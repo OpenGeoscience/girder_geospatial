@@ -2,8 +2,7 @@ from marshmallow import fields, ValidationError
 from geometa.schema import BaseSchema
 from geometa.utils import from_bounds_to_geojson
 from geometa.exceptions import CannotHandleError
-import gdal
-import osr
+from osgeo import gdal, osr
 import rasterio
 from rasterio.errors import RasterioIOError
 
