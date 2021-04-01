@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='girder-geospatial-grid',
-    version='0.1.0',
+    version='0.1.1',
     description='Support for grid data types'
                 'in the girder-geospatial package',
     url='https://github.com/OpenGeoscience/girder_geospatial',
